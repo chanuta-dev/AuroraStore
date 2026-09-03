@@ -1,5 +1,12 @@
 # Aurora Store Fork — Custom Whitelist & Patched APK Routing Architecture
 
+## 📋 הנחיות ופרוטוקול עבודה לסוכן AI (Agent Protocol)
+> **חובה לכל מופע / Issue חדש:**
+> 1. בתחילת כל משימה, קרא את קובץ זה כדי להבין את הארכיטקטורה ואת הסטטוס העדכני של הפרויקט.
+> 2. בכל קומיט או שינוי קוד, **עדכן תמיד** את סעיף [📌 סטטוס ומעקב משימות](#-סטטוס-ומעקב-משימות-roadmap--progress) בסוף הקובץ כדי לשמר רציפות וזיכרון בין סשנים ו-Issues.
+
+---
+
 ## 📌 Overview & Project Purpose
 This repository is a customized fork of **Aurora Store** (an open-source Android client for Google Play) and its underlying communication library **`gplayapi`**.
 
@@ -125,3 +132,16 @@ For every patched package in `selectedPatchedApps`:
 * **No Direct GitHub Actions Triggers**: The client does not embed GitHub PAT tokens. Any automated dispatching must go through a serverless proxy with rate limiting and deduplication.
 * **Extending Selected Patched Apps**: Add new mappings directly to `PatchedAppManager.selectedPatchedApps` in `gplayapi/PatchedAppManager.kt`.
 * **Adding Purely Custom/Private Apps**: Add the package name to `categorized-whitelist.json`. Ensure a corresponding descriptor or handling exists for metadata and direct APK downloads.
+
+---
+
+## 📌 סטטוס ומעקב משימות (Roadmap & Progress)
+
+### ✅ משימות שהושלמו:
+- [x] אינטגרציה מלאה של `WhitelistManager` ו-`PatchedAppManager` ב-`gplayapi`.
+- [x] מנגנון Three-Way Version Resolution ומניעת לולאות עדכון ("פאצ' בהכנה").
+- [x] שמירת מטמון לקטגוריות בדף הבית למניעת הבהובים.
+- [x] הגדרת פרוטוקול מעקב וזיכרון בין סשנים ב-`summery_for_AI.md`.
+
+### 🔄 משימות בהמתנה / שלבים הבאים:
+- [ ] הגדרת משימה ראשונה עם המשתמש.
