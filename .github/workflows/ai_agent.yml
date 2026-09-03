@@ -6,7 +6,16 @@ on:
   issue_comment:
     types: [created]
 
+permissions:
+  contents: write
+  pull-requests: write
+  issues: write
+
 jobs:
   call_central_agent:
+    permissions:
+      contents: write
+      pull-requests: write
+      issues: write
     uses: chanuta159-design/AI-agent/.github/workflows/gemini_agent.yml@main
     secrets: inherit
