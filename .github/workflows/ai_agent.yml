@@ -1,0 +1,12 @@
+name: Run AI Agent
+
+on:
+  issues:
+    types: [opened]
+  issue_comment:
+    types: [created]
+
+jobs:
+  call_central_agent:
+    uses: chanuta159-design/AI-agent/.github/workflows/gemini_agent.yml@main
+    secrets: inherit
