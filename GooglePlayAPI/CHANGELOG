@@ -1,0 +1,186 @@
+Changelog : v3.6.4
+• Update AuthHelper.isValid()
+
+Changelog : v3.6.3
+• Add deleteReview method to ReviewsHelper
+
+Changelog : v3.6.2
+• Fix app parsing issue
+• Fix cluster & bundle id issue
+
+Changelog : v3.6.1
+• Propagate server error to consumers
+• Use stable ids for data classes
+
+Changelog : v3.6.0
+• Expose GooglePlayException to consumers
+
+Changelog : v3.5.9
+• Bug fixes and improvements
+
+Changelog : v3.5.8
+• Fix AAS token generation issue
+
+Changelog : v3.5.7
+• Add new device config - SM A13
+• Fix regional content issue
+• Avoid adding devices to account
+• Bug fixes and improvements
+
+Changelog : v3.5.6
+• Bug fixes and improvements
+
+Changelog : v3.5.5
+• Bug fixes and improvements
+
+Changelog : v3.5.4
+• Improve native parsers
+• Bug fixes and improvements
+• Breaking Change: SearchContract has been updated, adapt your code accordingly
+
+Changelog : v3.5.3
+• Add support for app tags
+• Add PurchaseHelper.acquire() method to acquire apps
+• Bug fixes and improvements
+
+Changelog : v3.5.2
+• Fixed issue with Web APIs serialization
+
+Changelog : v3.5.1
+• All possible model classes are now parcelable and serializable using respective Kotlin libs
+
+Changelog : v3.5.0
+• PurchaseHelper now also expects versionCode as Long
+• Renamed File class to PlayFile to avoid conflicts with Java File
+• AuthData is now immutable data class, serializable with kotlin's serialization lib
+• AppSalesHelper has been retired as it is not part of official API
+• More classes have been marked as internal
+• Update dependencies and plugins
+
+Changelog : v3.4.8
+• Map properties for privacy policy and support section for App
+• All model objects are immutable
+• Drop old spoof configs
+
+Changelog : v3.4.7
+• Bump compileSdk to API 36
+• Map versionCode for App to Long instead of Int
+• Update dependencies and plugins
+
+Changelog : v3.4.6
+• Fix locale issue for Web API helper classes
+• Update dependencies & bump up Java version to 21
+
+Changelog : v3.4.5
+• Squash and improve auth validation logic into AuthHelper
+• Update dependencies & plugins
+
+Changelog : v3.4.4
+• Fix user reviews
+• Add back sortBy newest for reviews
+
+Changelog : v3.4.3
+• REUSE compliance
+• New method for Web API helper classes to change locale
+• Update dependencies & plugins
+
+Changelog : v3.4.2
+• Merge getOnDemandModule method into purchase method
+• Expose parameters for delta downloads in purchase method
+• Update dependencies & plugins
+
+Changelog : v3.4.1
+• Bump compileSdk to 35 (Android 15)
+• New WebDataSafetyHelper class for fetching data safety information
+• Update dependencies & plugins
+
+Changelog : v3.4.0
+• Model class(es) have been migrated to data class
+• AuthHelper has been simplified, requires using new method to build AuthData
+• Update dependencies & plugins
+
+Changelog : v3.3.1
+• New helper classes for fetching category streams
+• Code improvements
+
+Changelog : v3.3.0
+• New helper classes for fetching data using Web APIs
+• Code improvements, several classes have been marked as internal
+• Update dependencies & plugins
+
+Changelog : v3.2.12
+• Support for content ratings of apps
+• Update dependencies & plugins
+
+Changelog : v3.2.11
+• New spoof configurations for x86 devices
+• Update dependencies & plugins; Migrated to build version catalog
+• New PurchaseHelper method for selective file purchase
+
+Changelog : v3.2.10
+• Switch from Fuel to OkHttp library for network calls
+• Update dependencies & plugins
+• Bump compileSdk to 34
+
+Changelog : v3.2.9
+• Fix PurchaseHelper while purchasing apps with certificate hash
+
+Changelog : v3.2.8
+• Publish GPlayAPI on GitLab Package Registry
+
+Changelog : v3.2.7
+• Provide SHA256 and/or SHA1 when available for files purchased using PurchaseHelper
+
+Changelog : v3.2.6
+• Introduce new getDetailsResponseByPackageName method
+• Define more possible restrictions
+• Handle default for OTA property
+• Add compatibility information for active device
+• Expose required android version (or minSdk) for apps in app info
+
+Changelog : v3.2.5
+• Minor fix to PurchaseHelper to handle duplicates
+
+Changelog : v3.2.4
+• Improve WebSearchHelper
+• Fix non-ASCII characters issues in search suggestions & query
+
+Changelog : v3.2.3
+• Boring release
+
+Changelog : v3.2.2
+• Improve AuthValidator
+• Do not generate unused ac2dm & gcm tokens
+
+Changelog : v3.2.1
+• Fix WebSearchHelper
+
+Changelog : v3.2.0
+• Initial Web APIs support for search suggestions and results
+• Migrate to Kotlin DSL for gradle files
+• Add a sample app for easier testing and fixes
+
+Changelog : v3.1.4
+• Add Google Pixel Tablet spoofing configuration  
+• Bump minimum compile SDK to API 21  
+• Enable and compile with java language 17 features  
+• Make App class parcelable
+
+Changelog : v3.1.3  
+• Implement shared library dependencies API  
+
+Changelog : v3.1.2  
+• Fix lint issue with getting authentication value from HashMap  
+• Create a jitpack configuration for JDK 17 support  
+
+Changelog : v3.1.1  
+• Added Google Pixel 7a, Xiaomi 11 Lite 5G NE and Sony Bravia VU2 spoofing configurations  
+• Copied proguard rule from Aurora Store  
+• Updated dependencies and docker image  
+
+Changelog : v3.1.0  
+• Exposed response code for network calls via StateFlow from IHttpClient interface  
+• Keep device properties from being shrinked  
+
+Changelog : v3.0.1  
+• Initial changes (migration to AAR)  

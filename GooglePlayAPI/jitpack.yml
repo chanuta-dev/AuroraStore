@@ -1,0 +1,9 @@
+#
+# SPDX-FileCopyrightText: 2023 The Calyx Institute
+# SPDX-License-Identifier: GPL-3.0-or-later
+#
+
+jdk: openjdk21
+install:
+  - chmod +x gradlew
+  - ./gradlew :lib:publishToMavenLocal

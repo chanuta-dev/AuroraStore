@@ -1,0 +1,53 @@
+#
+# SPDX-FileCopyrightText: 2023 The Calyx Institute
+# SPDX-License-Identifier: GPL-3.0-or-later
+#
+
+image: theimpulson/gitlab-ci-android
+
+before_script:
+  - export GRADLE_USER_HOME=$(pwd)/.gradle
+  - chmod +x ./gradlew
+
+cache:
+  key: ${CI_PROJECT_ID}
+  paths:
+    - .gradle/
+
+stages:
+  - debug
+  - release
+  - publish
+
+assembleDebug:
+  stage: debug
+  rules:
+    - if: '$CI_PIPELINE_SOURCE == "merge_request_event"'
+      when: always
+    - if: '$CI_COMMIT_BRANCH != "$CI_DEFAULT_BRANCH"'
+      when: always
+  script:
+    - ./gradlew assembleDebug
+  artifacts:
+    paths:
+      - lib/build/outputs/aar/
+
+assembleRelease:
+  stage: release
+  allow_failure: false
+  rules:
+    - if: '$CI_PIPELINE_SOURCE == "push" && $CI_COMMIT_BRANCH == $CI_DEFAULT_BRANCH'
+      when: always
+  script:
+    - ./gradlew publishReleasePublicationToLocalRepository
+  artifacts:
+    paths:
+      - lib/build/repo/com/aurora/gplayapi/**/
+
+publish:
+  stage: publish
+  rules:
+    - if: '$CI_COMMIT_TAG'
+      when: always
+  script:
+    - ./gradlew publishReleasePublicationToGitLabRepository
