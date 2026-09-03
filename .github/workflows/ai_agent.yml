@@ -17,5 +17,5 @@ jobs:
       contents: write
       pull-requests: write
       issues: write
-    uses: chanuta159-design/AI-agent/.github/workflows/gemini_agent.yml@main
+    uses: chanuta-dev/AI-agent/.github/workflows/gemini_agent.yml@main
     secrets: inherit
