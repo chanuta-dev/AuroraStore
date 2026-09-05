@@ -1,5 +1,28 @@
 # Aurora Store Fork — Custom Whitelist & Patched APK Routing Architecture
 
+## 📋 Agent Instructions & Progress Protocol
+- **בכל תחילת עבודה / Issue חדש**: הסוכן מחוייב לקרוא סעיף זה ואת טבלת המשימות להלן כדי להבין את המצב הנוכחי.
+- **בכל ביצוע קומיט / משימה**: הסוכן מחוייב לעדכן את טבלת ההתקדמות והמשימות להלן בקובץ זה.
+
+---
+
+## 📌 סטטוס ומעקב משימות (Roadmap & Progress)
+
+### 🔄 משימה נוכחית / בטיפול:
+- [x] הגדרת פרוטוקול מעקב וסנכרון רציף בין Issues באמצעות `summery_for_AI.md`.
+
+### 📋 משימות פתוחות / לביצוע:
+- [ ] *יש להוסיף משימות לפי דרישת המשתמש*
+
+### ✅ משימות שהושלמו:
+- [x] הקמת תשתיות הרשימה הלבנה (`WhitelistManager`).
+- [x] מנגנון הסטת הורדות APKs מתוקנים מ-GitHub Releases (`PatchedAppManager`).
+- [x] ניהול גרסאות תלת-שלבי (הצגת "פאצ' בהכנה" במקרה של פערי גרסאות).
+- [x] ניהול מטמון ב-`StreamViewModel` למניעת טעינות חוזרות והבהובים.
+- [x] עקיפת בדיקות SHA-256 עבור אפליקציות מתוקנות ב-`DownloadWorker`.
+
+---
+
 ## 📌 Overview & Project Purpose
 This repository is a customized fork of **Aurora Store** (an open-source Android client for Google Play) and its underlying communication library **`gplayapi`**.
 
