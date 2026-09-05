@@ -1,5 +1,13 @@
 # Aurora Store Fork — Custom Whitelist & Patched APK Routing Architecture
 
+## 🤖 Agent Instructions & Progress Protocol
+> **קריטי לסוכן ה-AI (Gemini / Groq Agent):**
+> 1. בכל פתיחת Issue / ריצה, קרא קובץ זה במלואו כדי להבין את הארכיטקטורה והסטטוס הנוכחי.
+> 2. בכל ביצוע משימה או קומיט (Commit / PR), **חובה לעדכן ולתחזק את טבלת המעקב והסטטוס** בתחתית קובץ זה (`summery_for_AI.md`).
+> 3. יש לתעד מה בוצע, מה הסטטוס הנוכחי, ומה המשימות הבאות בתור.
+
+---
+
 ## 📌 Overview & Project Purpose
 This repository is a customized fork of **Aurora Store** (an open-source Android client for Google Play) and its underlying communication library **`gplayapi`**.
 
@@ -121,7 +129,11 @@ For every patched package in `selectedPatchedApps`:
 
 ---
 
-## 🔒 Security & Extensibility Notes
-* **No Direct GitHub Actions Triggers**: The client does not embed GitHub PAT tokens. Any automated dispatching must go through a serverless proxy with rate limiting and deduplication.
-* **Extending Selected Patched Apps**: Add new mappings directly to `PatchedAppManager.selectedPatchedApps` in `gplayapi/PatchedAppManager.kt`.
-* **Adding Purely Custom/Private Apps**: Add the package name to `categorized-whitelist.json`. Ensure a corresponding descriptor or handling exists for metadata and direct APK downloads.
+## 📌 סטטוס ומעקב משימות (Roadmap & Progress)
+
+| תאריך | משימה / נושא | סטטוס | פירוט ושינויים שבוצעו |
+|-------|--------------|-------|------------------------|
+| 2025-05-18 | הגדרת פרוטוקול מעקב וזיכרון לסוכן AI | ✅ הושלם | הוספת הנחיות פרוטוקול עבודה וטבלת מעקב ב-`summery_for_AI.md` לשמירת רצף הזיכרון בין Issues. |
+
+### 🛠️ משימות פתוחות / צעדים הבאים:
+- [ ] הגדרת משימת הליבה הבאה בפרויקט.
