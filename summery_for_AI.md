@@ -1,5 +1,12 @@
 # Aurora Store Fork — Custom Whitelist & Patched APK Routing Architecture
 
+> 🤖 **CRITICAL INSTRUCTIONS FOR AI AGENT (פרוטוקול עבודה וזיכרון לסוכן)**:
+> 1. **ALWAYS** read this entire file at the beginning of every session/issue to understand context and past updates.
+> 2. **ALWAYS** update the `📌 Progress & Task Tracker (מעקב משימות והתקדמות)` section at the bottom of this file on EVERY commit or executed task.
+> 3. Ensure completed tasks are marked with `[x]` and new pending tasks/notes are added accordingly.
+
+---
+
 ## 📌 Overview & Project Purpose
 This repository is a customized fork of **Aurora Store** (an open-source Android client for Google Play) and its underlying communication library **`gplayapi`**.
 
@@ -121,7 +128,11 @@ For every patched package in `selectedPatchedApps`:
 
 ---
 
-## 🔒 Security & Extensibility Notes
-* **No Direct GitHub Actions Triggers**: The client does not embed GitHub PAT tokens. Any automated dispatching must go through a serverless proxy with rate limiting and deduplication.
-* **Extending Selected Patched Apps**: Add new mappings directly to `PatchedAppManager.selectedPatchedApps` in `gplayapi/PatchedAppManager.kt`.
-* **Adding Purely Custom/Private Apps**: Add the package name to `categorized-whitelist.json`. Ensure a corresponding descriptor or handling exists for metadata and direct APK downloads.
+## 📌 Progress & Task Tracker (מעקב משימות והתקדמות)
+
+### 📋 Completed Tasks (משימות הושלמו)
+- [x] הקמת תשתיות סיכום ארכיטקטורה ב-`summery_for_AI.md`.
+- [x] הגדרת פרוטוקול זיכרון מחייב לסוכן AI בראש ובתחתית הקובץ `summery_for_AI.md`.
+
+### ⏳ Pending / Next Tasks (משימות בהמתנה/בטיפול)
+- [ ] הגדרת המשימה הראשונה לפיתוח / תיקון / שיפור ע"י המשתמש.
