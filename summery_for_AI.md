@@ -125,3 +125,8 @@ For every patched package in `selectedPatchedApps`:
 * **No Direct GitHub Actions Triggers**: The client does not embed GitHub PAT tokens. Any automated dispatching must go through a serverless proxy with rate limiting and deduplication.
 * **Extending Selected Patched Apps**: Add new mappings directly to `PatchedAppManager.selectedPatchedApps` in `gplayapi/PatchedAppManager.kt`.
 * **Adding Purely Custom/Private Apps**: Add the package name to `categorized-whitelist.json`. Ensure a corresponding descriptor or handling exists for metadata and direct APK downloads.
+
+---
+
+## 🧪 AI Capabilities Test
+* **Status**: AI PR Capabilities Verification in progress.
