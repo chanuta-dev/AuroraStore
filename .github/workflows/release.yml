@@ -47,6 +47,8 @@ jobs:
       - name: Sign APK
         uses: r0adkll/sign-android-release@v1
         id: sign_app
+        env:
+          BUILD_TOOLS_VERSION: "34.0.0" # <-- שורה זו פותרת את הבעיה!
         with:
           releaseDirectory: app/build/outputs/apk/vanilla/release
           signingKeyBase64: ${{ secrets.KEYSTORE_BASE64 }}
