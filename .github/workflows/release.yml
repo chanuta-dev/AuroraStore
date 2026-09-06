@@ -1,10 +1,20 @@
 name: Build & Release APK
 
 on:
-  push:
-    tags:
-      - 'v*'
   workflow_dispatch:
+    inputs:
+      release_type:
+        description: 'סוג הגרסה לבנייה'
+        required: true
+        default: 'prerelease'
+        type: choice
+        options:
+          - prerelease # גרסת ניסוי (Pre-release)
+          - release    # שחרור רשמי (Production Release)
+
+# מתן הרשאות ליצירת Releases ותגיות באופן אוטומטי
+permissions:
+  contents: write
 
 jobs:
   build:
@@ -12,7 +22,6 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-      # 1. מוריד רק את הקוד העדכני ביותר (חוסך זמן והורדה)
       - name: Checkout repository
         uses: actions/checkout@v4
         with:
@@ -25,18 +34,16 @@ jobs:
           distribution: 'zulu'
           java-version: '17'
 
-      # 2. שומר את כל ההורדות וה-Dependencies במטמון לריצות הבאות
       - name: Setup Gradle Cache
         uses: gradle/actions/setup-gradle@v3
 
       - name: Grant execute permission for gradlew
         run: chmod +x gradlew GooglePlayAPI/gradlew || true
 
-      # 3. בנייה עם דגלי ביצועים ו-Build Cache
       - name: Build with Gradle
         run: ./gradlew assembleVanillaRelease --build-cache --parallel --stacktrace
 
-      # 4. חתימה על ה-APK באמצעות המפתח שלך מה-Secrets
+      # חתימה על ה-APK עם המפתח מה-Secrets
       - name: Sign APK
         uses: r0adkll/sign-android-release@v1
         id: sign_app
@@ -47,18 +54,28 @@ jobs:
           keyStorePassword: ${{ secrets.KEYSTORE_PASSWORD }}
           keyPassword: ${{ secrets.KEY_PASSWORD }}
 
-      # 5. שמירת ה-APK החתום כ-Artifact
-      - name: Upload APK Artifact
-        uses: actions/upload-artifact@v4
-        with:
-          name: AuroraStore-Signed-APK
-          path: ${{ steps.sign_app.outputs.signedReleaseFile }}
+      # קביעת שם הגרסה והגדרות הריליס באופן אוטומטי
+      - name: Determine Version & Release Info
+        id: versioning
+        run: |
+          RUN_ID="${{ github.run_number }}"
+          if [ "${{ github.event.inputs.release_type }}" == "release" ]; then
+            echo "tag_name=v1.0.${RUN_ID}" >> $GITHUB_OUTPUT
+            echo "release_name=Release v1.0.${RUN_ID}" >> $GITHUB_OUTPUT
+            echo "is_prerelease=false" >> $GITHUB_OUTPUT
+          else
+            echo "tag_name=v1.0.${RUN_ID}-beta" >> $GITHUB_OUTPUT
+            echo "release_name=Beta/Experimental v1.0.${RUN_ID}" >> $GITHUB_OUTPUT
+            echo "is_prerelease=true" >> $GITHUB_OUTPUT
+          fi
 
-      # 6. יצירת Release אם הופעל בעזרת Tag
+      # יצירת ה-Release האוטומטי (יוצר גם את התגית בעצמו)
       - name: Create GitHub Release
-        if: startsWith(github.ref, 'refs/tags/v')
         uses: softprops/action-gh-release@v2
         with:
+          tag_name: ${{ steps.versioning.outputs.tag_name }}
+          name: ${{ steps.versioning.outputs.release_name }}
+          prerelease: ${{ steps.versioning.outputs.is_prerelease == 'true' }}
           files: ${{ steps.sign_app.outputs.signedReleaseFile }}
           generate_release_notes: true
         env:
