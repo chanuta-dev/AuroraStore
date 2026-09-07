@@ -13,7 +13,9 @@ import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
+import androidx.compose.material3.ListItem
 import androidx.compose.material3.Scaffold
+import androidx.compose.material3.Switch
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
@@ -25,7 +27,6 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import com.aurora.store.R
-import com.aurora.store.compose.ui.commons.SwitchPreference
 import com.aurora.store.util.Preferences
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -57,13 +58,17 @@ fun UpdatesScreen(onNavigateUp: () -> Unit) {
                 .padding(innerPadding)
                 .verticalScroll(rememberScrollState())
         ) {
-            SwitchPreference(
-                title = "קבלת עדכוני בטא (Pre-release)",
-                summary = "אפשר קבלת עדכוני ניסוי וגרסאות בטא ישירות מ-GitHub",
-                checked = includeBeta,
-                onCheckedChange = { checked ->
-                    includeBeta = checked
-                    Preferences.setBoolean(context, Preferences.PREFERENCE_INCLUDE_BETA_UPDATES, checked)
+            ListItem(
+                headlineContent = { Text("קבלת עדכוני בטא (Pre-release)") },
+                supportingContent = { Text("אפשר קבלת עדכוני ניסוי וגרסאות בטא ישירות מ-GitHub") },
+                trailingContent = {
+                    Switch(
+                        checked = includeBeta,
+                        onCheckedChange = { checked ->
+                            includeBeta = checked
+                            Preferences.setBoolean(context, Preferences.PREFERENCE_INCLUDE_BETA_UPDATES, checked)
+                        }
+                    )
                 }
             )
         }
