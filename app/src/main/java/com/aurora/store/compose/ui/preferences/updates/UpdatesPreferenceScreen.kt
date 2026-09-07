@@ -63,6 +63,7 @@ import com.aurora.store.util.Preferences.PREFERENCES_UPDATES_RESTRICTIONS_METERE
 import com.aurora.store.util.Preferences.PREFERENCE_FILTER_AURORA_ONLY
 import com.aurora.store.util.Preferences.PREFERENCE_FILTER_FDROID
 import com.aurora.store.util.Preferences.PREFERENCE_FILTER_INSTALLERS
+import com.aurora.store.util.Preferences.PREFERENCE_INCLUDE_BETA_UPDATES
 import com.aurora.store.util.Preferences.PREFERENCE_SELF_UPDATE_ENABLED
 import com.aurora.store.util.Preferences.PREFERENCE_UPDATES_AUTO
 import com.aurora.store.util.Preferences.PREFERENCE_UPDATES_CHECK_INTERVAL
@@ -116,6 +117,9 @@ private fun ScreenContent(
     }
     var warnTrackers by remember {
         mutableStateOf(Preferences.getBoolean(context, PREFERENCE_UPDATES_WARN_TRACKERS, false))
+    }
+    var includeBeta by remember {
+        mutableStateOf(Preferences.getBoolean(context, PREFERENCE_INCLUDE_BETA_UPDATES, false))
     }
     val selfUpdateSupported = remember { PackageUtil.isSelfUpdateSupported(context) }
     var selfUpdateEnabled by remember {
@@ -365,6 +369,29 @@ private fun ScreenContent(
                             onCheckedChange = { checked ->
                                 warnTrackers = checked
                                 context.save(PREFERENCE_UPDATES_WARN_TRACKERS, checked)
+                            }
+                        )
+                    }
+                )
+            }
+            item {
+                ListItem(
+                    modifier = Modifier.clickable {
+                        includeBeta = !includeBeta
+                        context.save(PREFERENCE_INCLUDE_BETA_UPDATES, includeBeta)
+                    },
+                    headlineContent = {
+                        Text("קבלת עדכוני בטא (Pre-release)")
+                    },
+                    supportingContent = {
+                        Text("אפשר קבלת עדכוני ניסוי וגרסאות בטא ישירות מ-GitHub")
+                    },
+                    trailingContent = {
+                        Switch(
+                            checked = includeBeta,
+                            onCheckedChange = { checked ->
+                                includeBeta = checked
+                                context.save(PREFERENCE_INCLUDE_BETA_UPDATES, checked)
                             }
                         )
                     }
