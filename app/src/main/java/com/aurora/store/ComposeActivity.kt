@@ -27,6 +27,8 @@ import androidx.lifecycle.LifecycleEventObserver
 import androidx.lifecycle.compose.LocalLifecycleOwner
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.aurora.extensions.getPackageName
+import com.aurora.gplayapi.ReleaseInfo
+import com.aurora.gplayapi.SelfUpdateManager
 import com.aurora.store.R
 import com.aurora.store.compose.composition.LocalNetworkStatus
 import com.aurora.store.compose.composition.LocalUI
@@ -34,12 +36,14 @@ import com.aurora.store.compose.composition.UI
 import com.aurora.store.compose.navigation.NavDisplay
 import com.aurora.store.compose.navigation.Screen
 import com.aurora.store.compose.theme.AuroraTheme
+import com.aurora.store.compose.ui.dialog.UpdateAvailableDialog
 import com.aurora.store.compose.ui.lock.AppLockScreen
 import com.aurora.store.data.AppLockManager
 import com.aurora.store.data.model.NetworkStatus
 import com.aurora.store.data.providers.NetworkProvider
 import com.aurora.store.data.receiver.MigrationReceiver
 import com.aurora.store.util.AppLockAuthenticator
+import com.aurora.store.util.AppSelfUpdater
 import com.aurora.store.util.PackageUtil
 import com.aurora.store.util.Preferences
 import dagger.hilt.android.AndroidEntryPoint
@@ -89,6 +93,29 @@ class ComposeActivity : FragmentActivity() {
                             LockState.AUTHENTICATING
                         } else {
                             LockState.UNLOCKED
+                        }
+                    )
+                }
+
+                var availableUpdate by remember { mutableStateOf<ReleaseInfo?>(null) }
+
+                LaunchedEffect(Unit) {
+                    val currentVersion = BuildConfig.VERSION_NAME
+                    val release = SelfUpdateManager.checkForUpdates(currentVersion)
+                    if (release != null) {
+                        availableUpdate = release
+                    }
+                }
+
+                availableUpdate?.let { release ->
+                    UpdateAvailableDialog(
+                        releaseInfo = release,
+                        onUpdate = {
+                            availableUpdate = null
+                            AppSelfUpdater.downloadAndInstall(this@ComposeActivity, release)
+                        },
+                        onDismiss = {
+                            availableUpdate = null
                         }
                     )
                 }
