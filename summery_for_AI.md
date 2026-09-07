@@ -51,6 +51,10 @@ The primary purpose of this fork is to operate as a **curated, filtered, and hyb
 
 ### 2. Aurora Store App Layer
 
+#### 📁 `app/src/main/AndroidManifest.xml`
+* Configured `tools:overrideLibrary="rikka.shizuku.api"` under `<uses-sdk>` to support minSdk 23 with Shizuku 13.1.5+ (which specifies minSdk 24).
+* FileProvider configured for self-updates (`.selfupdate.fileprovider`).
+
 #### 📁 `aurora/store/ComposeActivity.kt`
 * **Purpose**: Root Activity.
 * **Logic**:
