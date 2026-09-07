@@ -55,7 +55,7 @@ The primary purpose of this fork is to operate as a **curated, filtered, and hyb
 
 ## 🔄 App Self-Update Workflow
 
-1. App launches -> `ComposeActivity` runs `SelfUpdateManager.checkForUpdates(currentVersion, includeBeta)`.
+1. App launches -> `ComposeActivity` reads `PREFERENCE_INCLUDE_BETA_UPDATES` and executes `SelfUpdateManager.checkForUpdates(currentVersion, includeBeta)`.
 2. Queries GitHub API (`/releases` or `/releases/latest` based on preference).
 3. Compares latest available tag vs local `BuildConfig.VERSION_NAME`.
 4. If newer version exists, presents Compose `UpdateAvailableDialog` showing release notes and pre-release tag if applicable.
