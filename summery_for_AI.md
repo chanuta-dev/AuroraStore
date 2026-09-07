@@ -11,6 +11,7 @@ The primary purpose of this fork is to operate as a **curated, filtered, and hyb
 3. **Support for Non-Google Play Apps**: Enable discovery, rich metadata display, and installation of apps that do not exist on Google Play (e.g., MetroList, Meld, Termux) by falling back to external `app.json` descriptors.
 4. **Smart Version & Update Management**: Prevent update loops when upstream Google Play versions differ from patched releases, displaying an informative "Patch in progress" state when a patched build is pending.
 5. **Resilient Offline/Online Caching**: Seamlessly handle startup without network connectivity and eliminate flicker/re-fetch loops on tab navigation.
+6. **Automatic App Self-Update**: Automatically checks GitHub Releases (`chanuta-dev/AuroraStore`) on app launch and prompts the user to update when a newer build is released.
 
 ---
 
@@ -25,6 +26,10 @@ The primary purpose of this fork is to operate as a **curated, filtered, and hyb
 ## 🛠 Detailed Breakdown of Modifications by File
 
 ### 1. `gplayapi` Library Layer
+
+#### 📁 `gplayapi/SelfUpdateManager.kt` (New Singleton)
+* **Purpose**: Fetches the latest release of Aurora Store directly from `https://api.github.com/repos/chanuta-dev/AuroraStore/releases/latest`.
+* **Logic**: Compares `tag_name` with `BuildConfig.VERSION_NAME` and returns a `ReleaseInfo` object if a newer release with an APK asset exists.
 
 #### 📁 `gplayapi/WhitelistManager.kt` (New Singleton)
 * **Purpose**: Manages authorized packages and category trees.
@@ -42,86 +47,26 @@ The primary purpose of this fork is to operate as a **curated, filtered, and hyb
   * `isPatchedUpdateReady(packageName, installedVersionName)`: Compares installed version vs GitHub release version to prevent stale re-download loops.
   * `getAppMetadata(packageName)`: Dynamic fallback that fetches `https://raw.githubusercontent.com/cfopuser/app-store/main/apps/<appId>/app.json` when an app does not exist on Google Play (populating titles, descriptions in Hebrew/English, icons, categories, etc.).
 
-#### 📁 `gplayapi/data/models/StreamCluster.kt`
-* **Purpose**: Core data model for app clusters/carousels.
-* **Logic**:
-  * In `init {}`, filters `clusterAppList` against `WhitelistManager.isAuthorized(packageName)`. Prevents unauthorized apps from surfacing in any UI stream.
-
-#### 📁 `gplayapi/helpers/PurchaseHelper.kt`
-* **Purpose**: Obtains download links from Google Play protocols.
-* **Logic**:
-  * In `purchase(...)`, intercepts the call if `PatchedAppManager.isPatchedApp(packageName)`.
-  * Instead of issuing `acquire` and `delivery` RPCs to Google, returns a single `PlayFile(type = BASE)` containing the direct GitHub `browser_download_url`.
-
-#### 📁 `gplayapi/helpers/AppDetailsHelper.kt` & `WebAppDetailsHelper.kt`
-* **Purpose**: Metadata resolution for details screen and home clusters.
-* **Logic**:
-  * If Google Play returns 404 / empty payload (for apps like MetroList or Meld not present on Play Store) and `PatchedAppManager.isPatchedApp(packageName)` is true, falls back to `PatchedAppManager.getAppMetadata(packageName)`.
-
 ---
 
 ### 2. Aurora Store App Layer
-
-#### 📁 `aurora/store/AuroraApp.kt`
-* **Purpose**: Application lifecycle initialization.
-* **Logic**:
-  * In `onCreate()`, launches an asynchronous coroutine calling `WhitelistManager.fetchRemoteWhitelist()` and `PatchedAppManager.fetchReleases()`.
 
 #### 📁 `aurora/store/ComposeActivity.kt`
 * **Purpose**: Root Activity.
 * **Logic**:
   * Intercepts incoming deep links (`Intent.ACTION_VIEW` / market intents) and blocks any package not in `WhitelistManager.isAuthorized()`.
+  * On startup, triggers `SelfUpdateManager.checkForUpdates()` and presents `UpdateAvailableDialog` if an update is available.
 
-#### 📁 `aurora/store/viewmodel/homestream/StreamViewModel.kt`
-* **Purpose**: Powers the "For You" (בשבילך) home tab.
-* **Logic**:
-  * Replaces default Play Store home clusters with clusters derived from `WhitelistManager.categorizedApps`.
-  * **Memory Caching**: Checks `stash[category]?.hasCluster() == true` before dispatching `ViewState.Loading`, ensuring instant (0 ms) tab switching without re-fetching.
-  * **On-Demand Loading**: If `categorizedApps` is empty (e.g. cold start with no network), attempts `fetchRemoteWhitelist()` before building clusters, posting `ViewState.Error` if offline.
-  * **Batch Resolution**: Uses batch `webAppDetailsHelper.getAppByPackageName(packageList)` for fast category loading.
-
-#### 📁 `aurora/store/compose/ui/apps/ForYouPage.kt`
-* **Purpose**: Compose UI for home screen.
-* **Logic**:
-  * Observes `LocalNetworkStatus.current` and auto-refreshes the stream when connectivity is restored.
-  * Renders a `Placeholder` with an explicit "Try Again" retry action on `ViewState.Error`.
-
-#### 📁 `aurora/store/data/work/DownloadWorker.kt`
-* **Purpose**: Background download and verification execution.
-* **Logic**:
-  * In `verifyFile(gFile)`, checks if `PatchedAppManager.isPatchedApp(download.packageName)`. If true, bypasses strict SHA-256 hash checking against Google Play manifests (as re-signed patched APKs have different hashes) and validates basic file existence/size.
-
-#### 📁 `aurora/store/data/room/update/Update.kt`
-* **Purpose**: Room Entity representing available updates.
-* **Logic**:
-  * In `fromApp()`, sets `hasValidCert = true` for apps matched by `PatchedAppManager.isPatchedApp()`. Prevents Aurora from flagging custom-keystore-signed APKs as untrusted or incompatible.
-
-#### 📁 `aurora/store/viewmodel/details/AppDetailsViewModel.kt`
-* **Purpose**: ViewModel for app listing / details page.
-* **Logic**:
-  * Injected with `UpdateHelper`.
-  * `hasValidUpdate`: Checks both `isUpdateQueuedInDatabase` and `PatchedAppManager.isPatchedUpdateReady(pkg, installedVer)`. Changes the primary action from "Open" to "Update" when a newer patched build is ready on GitHub.
-
-#### 📁 `aurora/store/compose/composable/app/AppUpdateItem.kt` & `AppDetailsScreen.kt`
-* **Purpose**: Update listing row & details action buttons.
-* **Logic**:
-  * **Version Discrepancy Gate**: If an upstream Google Play update exists ($V_{Google} > V_{Installed}$), but the patched build has not been published yet ($V_{Patched} \le V_{Installed}$), the action button is replaced with a disabled button labeled **"פאצ' בהכנה"** (Patch in progress / Pending build). This prevents re-downloading stale APKs or overriding modified apps with unpatched binaries.
+#### 📁 `aurora/store/util/AppSelfUpdater.kt` & `UpdateAvailableDialog.kt`
+* **Purpose**: Download and installer helper for client updates.
+* **Logic**: Downloads the latest APK via Android `DownloadManager` and opens `PackageInstaller` / `ACTION_VIEW` intent via `FileProvider`.
 
 ---
 
-## 🚦 Three-Way Version Resolution Logic
+## 🔄 App Self-Update Workflow
 
-For every patched package in `selectedPatchedApps`:
-* **State 1 (Update Ready)**: $V_{Google} > V_{Installed}$ **AND** $V_{Patched} > V_{Installed}$  
-  ➡️ Active **"Update"** button. Downloads the latest patched APK from GitHub Releases.
-* **State 2 (Patch Pending)**: $V_{Google} > V_{Installed}$ **BUT** $V_{Patched} \le V_{Installed}$  
-  ➡️ App is listed in Updates tab, but button shows disabled **"פאצ' בהכנה"**. Prevents download loops.
-* **State 3 (Up to Date)**: $V_{Installed} == V_{Google}$ (or $V_{Installed} == V_{Patched}$)  
-  ➡️ Normal "Open" / "Uninstall" state.
-
----
-
-## 🔒 Security & Extensibility Notes
-* **No Direct GitHub Actions Triggers**: The client does not embed GitHub PAT tokens. Any automated dispatching must go through a serverless proxy with rate limiting and deduplication.
-* **Extending Selected Patched Apps**: Add new mappings directly to `PatchedAppManager.selectedPatchedApps` in `gplayapi/PatchedAppManager.kt`.
-* **Adding Purely Custom/Private Apps**: Add the package name to `categorized-whitelist.json`. Ensure a corresponding descriptor or handling exists for metadata and direct APK downloads.
+1. App launches -> `ComposeActivity` runs `SelfUpdateManager.checkForUpdates()`.
+2. Query `api.github.com/repos/chanuta-dev/AuroraStore/releases/latest`.
+3. Compare latest `tag_name` vs local `BuildConfig.VERSION_NAME`.
+4. If newer, present Compose `UpdateAvailableDialog` showing release notes.
+5. Upon user confirmation, `AppSelfUpdater` downloads the release APK asset and prompts Android package installation.
