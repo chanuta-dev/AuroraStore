@@ -11,7 +11,7 @@ The primary purpose of this fork is to operate as a **curated, filtered, and hyb
 3. **Support for Non-Google Play Apps**: Enable discovery, rich metadata display, and installation of apps that do not exist on Google Play (e.g., MetroList, Meld, Termux) by falling back to external `app.json` descriptors.
 4. **Smart Version & Update Management**: Prevent update loops when upstream Google Play versions differ from patched releases, displaying an informative "Patch in progress" state when a patched build is pending.
 5. **Resilient Offline/Online Caching**: Seamlessly handle startup without network connectivity and eliminate flicker/re-fetch loops on tab navigation.
-6. **Automatic App Self-Update**: Automatically checks GitHub Releases (`chanuta-dev/AuroraStore`) on app launch and prompts the user to update when a newer build is released.
+6. **Automatic App Self-Update**: Automatically checks GitHub Releases (`chanuta-dev/AuroraStore`) on app launch and prompts the user to update when a newer build is released. Includes support for opt-in beta/pre-release updates.
 
 ---
 
@@ -27,9 +27,13 @@ The primary purpose of this fork is to operate as a **curated, filtered, and hyb
 
 ### 1. `gplayapi` Library Layer
 
-#### 📁 `gplayapi/SelfUpdateManager.kt` (New Singleton)
-* **Purpose**: Fetches the latest release of Aurora Store directly from `https://api.github.com/repos/chanuta-dev/AuroraStore/releases/latest`.
-* **Logic**: Compares `tag_name` with `BuildConfig.VERSION_NAME` and returns a `ReleaseInfo` object if a newer release with an APK asset exists.
+#### 📁 `gplayapi/SelfUpdateManager.kt` (Updated Singleton)
+* **Purpose**: Fetches release updates for Aurora Store directly from GitHub Releases (`chanuta-dev/AuroraStore`).
+* **Logic**:
+  * Supports `includeBeta: Boolean` parameter in `checkForUpdates()`.
+  * When `includeBeta == true`, queries `/releases` to evaluate both stable and pre-release (beta) versions.
+  * When `includeBeta == false`, queries `/releases/latest` for official stable releases only.
+  * Compares version strings and returns `ReleaseInfo` with download URL and `isPrerelease` indicator.
 
 #### 📁 `gplayapi/WhitelistManager.kt` (New Singleton)
 * **Purpose**: Manages authorized packages and category trees.
@@ -49,29 +53,10 @@ The primary purpose of this fork is to operate as a **curated, filtered, and hyb
 
 ---
 
-### 2. Aurora Store App Layer
-
-#### 📁 `app/src/main/AndroidManifest.xml` & `app/lint.xml`
-* Configured `tools:overrideLibrary="rikka.shizuku.api"` under `<uses-sdk>` to support minSdk 23 with Shizuku 13.1.5+ (which specifies minSdk 24).
-* Suppressed WorkManager lint issues in `app/lint.xml` (`RemoveWorkManagerInitializer`, `SpecifyForegroundServiceType`) to allow clean `assembleVanillaRelease` builds.
-* FileProvider configured for self-updates (`.selfupdate.fileprovider`).
-
-#### 📁 `aurora/store/ComposeActivity.kt`
-* **Purpose**: Root Activity.
-* **Logic**:
-  * Intercepts incoming deep links (`Intent.ACTION_VIEW` / market intents) and blocks any package not in `WhitelistManager.isAuthorized()`.
-  * On startup, triggers `SelfUpdateManager.checkForUpdates()` and presents `UpdateAvailableDialog` if an update is available.
-
-#### 📁 `aurora/store/util/AppSelfUpdater.kt` & `UpdateAvailableDialog.kt`
-* **Purpose**: Download and installer helper for client updates.
-* **Logic**: Downloads the latest APK via Android `DownloadManager` and opens `PackageInstaller` / `ACTION_VIEW` intent via `FileProvider`.
-
----
-
 ## 🔄 App Self-Update Workflow
 
-1. App launches -> `ComposeActivity` runs `SelfUpdateManager.checkForUpdates()`.
-2. Query `api.github.com/repos/chanuta-dev/AuroraStore/releases/latest`.
-3. Compare latest `tag_name` vs local `BuildConfig.VERSION_NAME`.
-4. If newer, present Compose `UpdateAvailableDialog` showing release notes.
+1. App launches -> `ComposeActivity` runs `SelfUpdateManager.checkForUpdates(currentVersion, includeBeta)`.
+2. Queries GitHub API (`/releases` or `/releases/latest` based on preference).
+3. Compares latest available tag vs local `BuildConfig.VERSION_NAME`.
+4. If newer version exists, presents Compose `UpdateAvailableDialog` showing release notes and pre-release tag if applicable.
 5. Upon user confirmation, `AppSelfUpdater` downloads the release APK asset and prompts Android package installation.
