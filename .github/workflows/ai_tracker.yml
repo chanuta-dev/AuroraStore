@@ -3,7 +3,7 @@ name: Auto Update AI Changes
 on:
   push:
     branches:
-      - master # שים לב: אם הענף הראשי שלך נקרא main, שנה כאן ל-main
+      - main # שים לב: אם הענף הראשי שלך נקרא main, שנה כאן ל-main
     paths-ignore:
       - 'AI_CHANGES.md'
       - '.github/**'
