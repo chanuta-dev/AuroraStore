@@ -22,33 +22,23 @@ jobs:
 
       - name: Generate AI Diff
         run: |
-          # יצירת מקטע השינוי הנוכחי
-          cat << 'EOF' > new_entry.tmp
-          ## 📅 עדכון: $(date -u +"%Y-%m-%d %H:%M:%S UTC")
-          **הודעת קומיט:** ${{ github.event.head_commit.message }}
-          **קוד שינוי:** `${{ github.sha }}`
-
-          ### 📂 קבצים שהושפעו:
-          EOF
-
+          CURRENT_DATE=$(date -u +"%Y-%m-%d %H:%M:%S UTC")
+          
+          # יצירת מקטע השינוי הנוכחי עם תאריך תקין
+          echo "## 📅 עדכון: $CURRENT_DATE" > new_entry.tmp
+          echo "**הודעת קומיט:** ${{ github.event.head_commit.message }}" >> new_entry.tmp
+          echo "**קוד שינוי:** \`${{ github.sha }}\`" >> new_entry.tmp
+          echo "" >> new_entry.tmp
+          echo "### 📂 קבצים שהושפעו:" >> new_entry.tmp
           git diff --name-status HEAD~1 HEAD >> new_entry.tmp
-
-          cat << 'EOF' >> new_entry.tmp
-
-          ### 📝 פירוט השינויים (Diff):
-          ```diff
-          EOF
-
+          echo "" >> new_entry.tmp
+          echo "### 📝 פירוט השינויים (Diff):" >> new_entry.tmp
+          echo '```diff' >> new_entry.tmp
           git diff HEAD~1 HEAD >> new_entry.tmp
+          echo '```' >> new_entry.tmp
+          echo -e "\n---\n" >> new_entry.tmp
 
-          cat << 'EOF' >> new_entry.tmp
-          ```
-
-          ---
-
-          EOF
-
-          # שרשור השינוי החדש לראש הקובץ הקיים (כדי שהחדש ביותר יהיה ראשון)
+          # שרשור השינוי החדש לראש הקובץ הקיים (החדש ביותר תמיד למעלה)
           if [ -f AI_CHANGES.md ]; then
             cat new_entry.tmp AI_CHANGES.md > combined.tmp
             mv combined.tmp AI_CHANGES.md
