@@ -1,0 +1,66 @@
+name: Auto Update AI Changes
+
+on:
+  push:
+    branches:
+      - master # שים לב: אם הענף הראשי שלך נקרא main, שנה כאן ל-main
+    paths-ignore:
+      - 'AI_CHANGES.md'
+      - '.github/**'
+
+permissions:
+  contents: write
+
+jobs:
+  track-changes:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 2 # מאפשר לראות את השינוי ביחס לגרסה הקודמת
+
+      - name: Generate AI Diff
+        run: |
+          # יצירת מקטע השינוי הנוכחי
+          cat << 'EOF' > new_entry.tmp
+          ## 📅 עדכון: $(date -u +"%Y-%m-%d %H:%M:%S UTC")
+          **הודעת קומיט:** ${{ github.event.head_commit.message }}
+          **קוד שינוי:** `${{ github.sha }}`
+
+          ### 📂 קבצים שהושפעו:
+          EOF
+
+          git diff --name-status HEAD~1 HEAD >> new_entry.tmp
+
+          cat << 'EOF' >> new_entry.tmp
+
+          ### 📝 פירוט השינויים (Diff):
+          ```diff
+          EOF
+
+          git diff HEAD~1 HEAD >> new_entry.tmp
+
+          cat << 'EOF' >> new_entry.tmp
+          ```
+
+          ---
+
+          EOF
+
+          # שרשור השינוי החדש לראש הקובץ הקיים (כדי שהחדש ביותר יהיה ראשון)
+          if [ -f AI_CHANGES.md ]; then
+            cat new_entry.tmp AI_CHANGES.md > combined.tmp
+            mv combined.tmp AI_CHANGES.md
+            rm -f new_entry.tmp
+          else
+            mv new_entry.tmp AI_CHANGES.md
+          fi
+
+      - name: Commit and Push
+        run: |
+          git config --global user.name "github-actions[bot]"
+          git config --global user.email "github-actions[bot]@users.noreply.github.com"
+          git add AI_CHANGES.md
+          git commit -m "docs: update AI_CHANGES.md [skip ci]" || exit 0
+          git push
