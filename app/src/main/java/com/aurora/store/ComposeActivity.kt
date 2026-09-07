@@ -101,7 +101,8 @@ class ComposeActivity : FragmentActivity() {
 
                 LaunchedEffect(Unit) {
                     val currentVersion = BuildConfig.VERSION_NAME
-                    val release = SelfUpdateManager.checkForUpdates(currentVersion)
+                    val includeBeta = Preferences.getBoolean(this@ComposeActivity, Preferences.PREFERENCE_INCLUDE_BETA_UPDATES, false)
+                    val release = SelfUpdateManager.checkForUpdates(currentVersion, includeBeta)
                     if (release != null) {
                         availableUpdate = release
                     }
