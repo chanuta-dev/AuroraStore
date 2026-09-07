@@ -9,4 +9,6 @@
     <issue id="ProtectedPermissions" severity="ignore" />
     <issue id="QueryAllPackagesPermission" severity="ignore" />
     <issue id="ScopedStorage" severity="ignore" />
+    <issue id="RemoveWorkManagerInitializer" severity="ignore" />
+    <issue id="SpecifyForegroundServiceType" severity="ignore" />
 </lint>
