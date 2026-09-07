@@ -1,3 +1,68 @@
+## 📅 עדכון: 2026-09-07 22:12:38 UTC
+**הודעת קומיט:** Update UpdatesPreferenceScreen.kt
+**קוד שינוי:** `852b0886d506192b877bd6b8e564ff11dae89e6f`
+
+### 📂 קבצים שהושפעו:
+M	app/src/main/java/com/aurora/store/compose/ui/preferences/updates/UpdatesPreferenceScreen.kt
+
+### 📝 פירוט השינויים (Diff):
+```diff
+diff --git a/app/src/main/java/com/aurora/store/compose/ui/preferences/updates/UpdatesPreferenceScreen.kt b/app/src/main/java/com/aurora/store/compose/ui/preferences/updates/UpdatesPreferenceScreen.kt
+index 7d8634c..1d03b21 100644
+--- a/app/src/main/java/com/aurora/store/compose/ui/preferences/updates/UpdatesPreferenceScreen.kt
++++ b/app/src/main/java/com/aurora/store/compose/ui/preferences/updates/UpdatesPreferenceScreen.kt
+@@ -63,6 +63,7 @@ import com.aurora.store.util.Preferences.PREFERENCES_UPDATES_RESTRICTIONS_METERE
+ import com.aurora.store.util.Preferences.PREFERENCE_FILTER_AURORA_ONLY
+ import com.aurora.store.util.Preferences.PREFERENCE_FILTER_FDROID
+ import com.aurora.store.util.Preferences.PREFERENCE_FILTER_INSTALLERS
++import com.aurora.store.util.Preferences.PREFERENCE_INCLUDE_BETA_UPDATES
+ import com.aurora.store.util.Preferences.PREFERENCE_SELF_UPDATE_ENABLED
+ import com.aurora.store.util.Preferences.PREFERENCE_UPDATES_AUTO
+ import com.aurora.store.util.Preferences.PREFERENCE_UPDATES_CHECK_INTERVAL
+@@ -117,6 +118,9 @@ private fun ScreenContent(
+     var warnTrackers by remember {
+         mutableStateOf(Preferences.getBoolean(context, PREFERENCE_UPDATES_WARN_TRACKERS, false))
+     }
++    var includeBeta by remember {
++        mutableStateOf(Preferences.getBoolean(context, PREFERENCE_INCLUDE_BETA_UPDATES, false))
++    }
+     val selfUpdateSupported = remember { PackageUtil.isSelfUpdateSupported(context) }
+     var selfUpdateEnabled by remember {
+         mutableStateOf(Preferences.getBoolean(context, PREFERENCE_SELF_UPDATE_ENABLED, true))
+@@ -370,6 +374,29 @@ private fun ScreenContent(
+                     }
+                 )
+             }
++            item {
++                ListItem(
++                    modifier = Modifier.clickable {
++                        includeBeta = !includeBeta
++                        context.save(PREFERENCE_INCLUDE_BETA_UPDATES, includeBeta)
++                    },
++                    headlineContent = {
++                        Text("קבלת עדכוני בטא (Pre-release)")
++                    },
++                    supportingContent = {
++                        Text("אפשר קבלת עדכוני ניסוי וגרסאות בטא ישירות מ-GitHub")
++                    },
++                    trailingContent = {
++                        Switch(
++                            checked = includeBeta,
++                            onCheckedChange = { checked ->
++                                includeBeta = checked
++                                context.save(PREFERENCE_INCLUDE_BETA_UPDATES, checked)
++                            }
++                        )
++                    }
++                )
++            }
+             if (selfUpdateSupported) {
+                 item {
+                     fun onSelfUpdateChanged(enabled: Boolean) {
+```
+
+---
+
 ## 📅 עדכון: 2026-09-07 22:11:59 UTC
 **הודעת קומיט:** Delete app/src/main/java/com/aurora/store/compose/ui/settings/UpdatesScreen.kt
 **קוד שינוי:** `9f91bd20b9da26f9de1f4b125379480c3935dd19`
