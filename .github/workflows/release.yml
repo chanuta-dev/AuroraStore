@@ -12,7 +12,6 @@ on:
           - prerelease # גרסת ניסוי (Pre-release)
           - release    # שחרור רשמי (Production Release)
 
-# מתן הרשאות ליצירת Releases ותגיות באופן אוטומטי
 permissions:
   contents: write
 
@@ -37,10 +36,36 @@ jobs:
       - name: Setup Gradle Cache
         uses: gradle/actions/setup-gradle@v3
 
+      # קביעת מספרי הגרסאות לפני הבנייה
+      - name: Determine Version & Release Info
+        id: versioning
+        run: |
+          RUN_ID="${{ github.run_number }}"
+          V_CODE=$((1000 + RUN_ID))
+          echo "version_code=$V_CODE" >> $GITHUB_OUTPUT
+
+          if [ "${{ github.event.inputs.release_type }}" == "release" ]; then
+            V_NAME="5.0.${RUN_ID}"
+            echo "version_name=$V_NAME" >> $GITHUB_OUTPUT
+            echo "tag_name=v${V_NAME}" >> $GITHUB_OUTPUT
+            echo "release_name=Release v${V_NAME}" >> $GITHUB_OUTPUT
+            echo "is_prerelease=false" >> $GITHUB_OUTPUT
+          else
+            V_NAME="5.0.${RUN_ID}-beta"
+            echo "version_name=$V_NAME" >> $GITHUB_OUTPUT
+            echo "tag_name=v${V_NAME}" >> $GITHUB_OUTPUT
+            echo "release_name=Beta/Experimental v${V_NAME}" >> $GITHUB_OUTPUT
+            echo "is_prerelease=true" >> $GITHUB_OUTPUT
+          fi
+
       - name: Grant execute permission for gradlew
         run: chmod +x gradlew GooglePlayAPI/gradlew || true
 
+      # הזרקת הגרסאות לתוך ה-APK בעת הבנייה
       - name: Build with Gradle
+        env:
+          APP_VERSION_NAME: ${{ steps.versioning.outputs.version_name }}
+          APP_VERSION_CODE: ${{ steps.versioning.outputs.version_code }}
         run: ./gradlew assembleVanillaRelease --build-cache --parallel --stacktrace
 
       # חתימה על ה-APK עם המפתח מה-Secrets
@@ -48,7 +73,7 @@ jobs:
         uses: r0adkll/sign-android-release@v1
         id: sign_app
         env:
-          BUILD_TOOLS_VERSION: "34.0.0" # <-- שורה זו פותרת את הבעיה!
+          BUILD_TOOLS_VERSION: "34.0.0"
         with:
           releaseDirectory: app/build/outputs/apk/vanilla/release
           signingKeyBase64: ${{ secrets.KEYSTORE_BASE64 }}
@@ -56,22 +81,7 @@ jobs:
           keyStorePassword: ${{ secrets.KEYSTORE_PASSWORD }}
           keyPassword: ${{ secrets.KEY_PASSWORD }}
 
-      # קביעת שם הגרסה והגדרות הריליס באופן אוטומטי
-      - name: Determine Version & Release Info
-        id: versioning
-        run: |
-          RUN_ID="${{ github.run_number }}"
-          if [ "${{ github.event.inputs.release_type }}" == "release" ]; then
-            echo "tag_name=v1.0.${RUN_ID}" >> $GITHUB_OUTPUT
-            echo "release_name=Release v1.0.${RUN_ID}" >> $GITHUB_OUTPUT
-            echo "is_prerelease=false" >> $GITHUB_OUTPUT
-          else
-            echo "tag_name=v1.0.${RUN_ID}-beta" >> $GITHUB_OUTPUT
-            echo "release_name=Beta/Experimental v1.0.${RUN_ID}" >> $GITHUB_OUTPUT
-            echo "is_prerelease=true" >> $GITHUB_OUTPUT
-          fi
-
-      # יצירת ה-Release האוטומטי (יוצר גם את התגית בעצמו)
+      # יצירת ה-Release ב-GitHub
       - name: Create GitHub Release
         uses: softprops/action-gh-release@v2
         with:
