@@ -1,3 +1,42 @@
+## 📅 עדכון: 2026-09-08 00:25:04 UTC
+**הודעת קומיט:** Update build.gradle.kts
+**קוד שינוי:** `04fc17ff9a7d544b2bf5439d6328e3263d09a82f`
+
+### 📂 קבצים שהושפעו:
+M	app/build.gradle.kts
+
+### 📝 פירוט השינויים (Diff):
+```diff
+diff --git a/app/build.gradle.kts b/app/build.gradle.kts
+index 34e2394..7448d14 100644
+--- a/app/build.gradle.kts
++++ b/app/build.gradle.kts
+@@ -64,8 +64,12 @@ configure<ApplicationExtension> {
+             version = release(37)
+         }
+ 
+-        versionCode = 76
+-        versionName = "4.8.4"
++        // קריאה חכמה מ-GitHub Actions עם fallback לפיתוח מקומי
++        val envVersionCode = (System.getenv("APP_VERSION_CODE") ?: (project.findProperty("versionCode") as? String))?.toIntOrNull()
++        val envVersionName = System.getenv("APP_VERSION_NAME") ?: (project.findProperty("versionName") as? String)
++
++        versionCode = envVersionCode ?: 76
++        versionName = envVersionName ?: "4.8.4"
+ 
+         buildConfigField("String", "EXODUS_API_KEY", "\"bbe6ebae4ad45a9cbacb17d69739799b8df2c7ae\"")
+         buildConfigField("long", "BUILD_TIMESTAMP", "${lastCommitTimestamp.get()}L")
+@@ -227,4 +231,4 @@ dependencies {
+ 
+     // LeakCanary
+     debugImplementation(libs.squareup.leakcanary.android)
+-}
+\ No newline at end of file
++}
+```
+
+---
+
 ## 📅 עדכון: 2026-09-07 22:12:38 UTC
 **הודעת קומיט:** Update UpdatesPreferenceScreen.kt
 **קוד שינוי:** `852b0886d506192b877bd6b8e564ff11dae89e6f`
