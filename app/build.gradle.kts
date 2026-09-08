@@ -64,8 +64,12 @@ configure<ApplicationExtension> {
             version = release(37)
         }
 
-        versionCode = 76
-        versionName = "4.8.4"
+        // קריאה חכמה מ-GitHub Actions עם fallback לפיתוח מקומי
+        val envVersionCode = (System.getenv("APP_VERSION_CODE") ?: (project.findProperty("versionCode") as? String))?.toIntOrNull()
+        val envVersionName = System.getenv("APP_VERSION_NAME") ?: (project.findProperty("versionName") as? String)
+
+        versionCode = envVersionCode ?: 76
+        versionName = envVersionName ?: "4.8.4"
 
         buildConfigField("String", "EXODUS_API_KEY", "\"bbe6ebae4ad45a9cbacb17d69739799b8df2c7ae\"")
         buildConfigField("long", "BUILD_TIMESTAMP", "${lastCommitTimestamp.get()}L")
