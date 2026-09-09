@@ -1,3 +1,55 @@
+## 📅 עדכון: 2026-09-09 16:26:11 UTC
+**הודעת קומיט:** Update ComposeActivity.kt
+**קוד שינוי:** `ac1d5681e8105975aa25dd22c60416e9106f8c65`
+
+### 📂 קבצים שהושפעו:
+M	app/src/main/java/com/aurora/store/ComposeActivity.kt
+
+### 📝 פירוט השינויים (Diff):
+```diff
+diff --git a/app/src/main/java/com/aurora/store/ComposeActivity.kt b/app/src/main/java/com/aurora/store/ComposeActivity.kt
+index b14a9fa..8f0c7b3 100644
+--- a/app/src/main/java/com/aurora/store/ComposeActivity.kt
++++ b/app/src/main/java/com/aurora/store/ComposeActivity.kt
+@@ -191,17 +191,27 @@ class ComposeActivity : FragmentActivity() {
+     }
+ 
+     private fun resolveStartDestination(): Screen {
+-        // Parcel-based navigation (e.g. from NotificationUtil or DeepLinkConfirmActivity, which
+-        // owns the external ACTION_VIEW market:// and play.google.com deep links)
+-        IntentCompat.getParcelableExtra(intent, Screen.PARCEL_KEY, Screen::class.java)
+-            ?.let { return it }
++        if (!Preferences.getBoolean(this, Preferences.PREFERENCE_INTRO)) {
++            return Screen.Onboarding
++        }
+ 
+-        // SEND / SHOW_APP_INFO — getPackageName() handles both
+-        intent.getPackageName()?.let { return Screen.AppDetails(it) }
++        // 1. קריאת שם החבילה מדיפ-לינק או Intent חיצוני
++        val targetPackage = intent.getPackageName()
++        if (!targetPackage.isNullOrBlank()) {
++            // ניתוב דרך Splash כדי להבטיח שסשן ההתחברות וה-Whitelist נטענו
++            return Screen.Splash(packageName = targetPackage)
++        }
++
++        // 2. ניווט מבוסס Parcel (התראות / מסכים פנימיים)
++        IntentCompat.getParcelableExtra(intent, Screen.PARCEL_KEY, Screen::class.java)?.let { screen ->
++            if (screen is Screen.AppDetails) {
++                return Screen.Splash(packageName = screen.packageName)
++            }
++            return screen
++        }
+ 
+         return defaultStart()
+     }
+-
+     private fun defaultStart(): Screen = when {
+         !Preferences.getBoolean(this, Preferences.PREFERENCE_INTRO) -> Screen.Onboarding
+         else -> Screen.Splash()
+```
+
+---
+
 ## 📅 עדכון: 2026-09-09 16:21:24 UTC
 **הודעת קומיט:** Update DeepLinkConfirmActivity.kt
 **קוד שינוי:** `f36abf548675deeb5f2db6c3a8e4c7d64a71f2ee`
