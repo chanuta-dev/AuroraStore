@@ -88,11 +88,8 @@ import com.aurora.store.compose.ui.details.composable.DataSafety
 import com.aurora.store.compose.ui.details.composable.Details
 import com.aurora.store.compose.ui.details.composable.DeveloperDetails
 import com.aurora.store.compose.ui.details.composable.Privacy
-import com.aurora.store.compose.ui.details.composable.RatingAndReviews
-import com.aurora.store.compose.ui.details.composable.Screenshots
 import com.aurora.store.compose.ui.details.composable.Tags
 import com.aurora.store.compose.ui.details.composable.Testing
-import com.aurora.store.compose.ui.details.composable.UserReview
 import com.aurora.store.compose.ui.details.menu.AppDetailsMenu
 import com.aurora.store.compose.ui.details.menu.MenuItem
 import com.aurora.store.compose.ui.details.navigation.ExtraScreen
@@ -306,7 +303,7 @@ private fun ScreenContentApp(
     onNavigateTo: (Destination) -> Unit = {},
     onLoadMoreCluster: (cluster: StreamCluster) -> Unit = {},
     accounts: List<Account> = emptyList(),
-    onDownload: (requestedApp: App) -> Unit = {},
+    onDownload = { requestedApp: App -> viewModelEnqueue(requestedApp) },
     onDownloadWith: (requestedApp: App, accountId: String) -> Unit = { _, _ -> },
     onFavorite: () -> Unit = {},
     onCancelDownload: () -> Unit = {},
@@ -638,32 +635,6 @@ private fun ScreenContentApp(
                     }
 
                     item {
-                        Screenshots(
-                            screenshots = app.screenshots,
-                            onNavigateToScreenshot = { showExtraPane(ExtraScreen.Screenshot(it)) }
-                        )
-                    }
-
-                    item {
-                        RatingAndReviews(
-                            rating = app.rating,
-                            featuredReviews = featuredReviews,
-                            onNavigateToDetailsReview = { showExtraPane(ExtraScreen.Review) }
-                        )
-                    }
-
-                    item {
-                        // Reviews can only be submitted by personal accounts for installed apps.
-                        if (!isAnonymous && app.isInstalled) {
-                            UserReview(
-                                review = userReview,
-                                onSubmit = onSubmitReview,
-                                onDelete = onDeleteReview
-                            )
-                        }
-                    }
-
-                    item {
                         if (!isAnonymous && app.testingProgram?.isAvailable == true) {
                             Testing(
                                 isSubscribed = app.testingProgram!!.isSubscribed,
@@ -889,13 +860,13 @@ private fun AppDetailsScreenPreview(@PreviewParameter(AppPreviewProvider::class)
 @PreviewWrapper(ThemePreviewProvider::class)
 @Preview
 @Composable
-private fun AppDetailsScreenPreviewLoading() {
+private fun ScreenContentLoading() {
     ScreenContentLoading()
 }
 
 @PreviewWrapper(ThemePreviewProvider::class)
 @Preview
 @Composable
-private fun AppDetailsScreenPreviewError() {
+private fun ScreenContentError() {
     ScreenContentError()
 }
