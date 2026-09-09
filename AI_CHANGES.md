@@ -1,3 +1,29 @@
+## 📅 עדכון: 2026-09-09 14:35:02 UTC
+**הודעת קומיט:** Fix permission type usage in AppDetailsScreen
+**קוד שינוי:** `191f37e977b956acde7f4c6af51d3c4d07bb8dd1`
+
+### 📂 קבצים שהושפעו:
+M	app/src/main/java/com/aurora/store/compose/ui/details/AppDetailsScreen.kt
+
+### 📝 פירוט השינויים (Diff):
+```diff
+diff --git a/app/src/main/java/com/aurora/store/compose/ui/details/AppDetailsScreen.kt b/app/src/main/java/com/aurora/store/compose/ui/details/AppDetailsScreen.kt
+index 6de02e0..5c3229a 100644
+--- a/app/src/main/java/com/aurora/store/compose/ui/details/AppDetailsScreen.kt
++++ b/app/src/main/java/com/aurora/store/compose/ui/details/AppDetailsScreen.kt
+@@ -396,7 +396,7 @@ private fun ScreenContentApp(
+         } else {
+             isChecking = false
+             val requiredPermissions = setOfNotNull(
+-                PermissionType.INSTALL_UNKNOWNAPPS ?: PermissionType.INSTALL_UNKNOWN_APPS,
++                PermissionType.INSTALL_UNKNOWN_APPS,
+                 if (app.fileList.requiresObbDir()) PermissionType.STORAGE_MANAGER else null,
+                 if (app.fileList.requiresObbDir()) PermissionType.EXTERNAL_STORAGE else null
+             )
+```
+
+---
+
 ## 📅 עדכון: 2026-09-09 14:28:10 UTC
 **הודעת קומיט:** Update AppDetailsScreen.kt
 **קוד שינוי:** `ef6256eed0daa8b05a48d1e14d7991c3245476ba`
