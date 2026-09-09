@@ -1,11 +1,12 @@
-name: Auto Update AI Changes
+name: Auto Update AI Changes and Tree
 
 on:
   push:
     branches:
-      - main # שים לב: אם הענף הראשי שלך נקרא main, שנה כאן ל-main
+      - main
     paths-ignore:
       - 'AI_CHANGES.md'
+      - 'PROJECT_TREE.md'
       - '.github/**'
 
 permissions:
@@ -18,13 +19,12 @@ jobs:
       - name: Checkout Code
         uses: actions/checkout@v4
         with:
-          fetch-depth: 2 # מאפשר לראות את השינוי ביחס לגרסה הקודמת
+          fetch-depth: 2
 
+      # שלב 1: מעקב אחר השינוי האחרון
       - name: Generate AI Diff
         run: |
           CURRENT_DATE=$(date -u +"%Y-%m-%d %H:%M:%S UTC")
-          
-          # יצירת מקטע השינוי הנוכחי עם תאריך תקין
           echo "## 📅 עדכון: $CURRENT_DATE" > new_entry.tmp
           echo "**הודעת קומיט:** ${{ github.event.head_commit.message }}" >> new_entry.tmp
           echo "**קוד שינוי:** \`${{ github.sha }}\`" >> new_entry.tmp
@@ -38,7 +38,6 @@ jobs:
           echo '```' >> new_entry.tmp
           echo -e "\n---\n" >> new_entry.tmp
 
-          # שרשור השינוי החדש לראש הקובץ הקיים (החדש ביותר תמיד למעלה)
           if [ -f AI_CHANGES.md ]; then
             cat new_entry.tmp AI_CHANGES.md > combined.tmp
             mv combined.tmp AI_CHANGES.md
@@ -47,10 +46,24 @@ jobs:
             mv new_entry.tmp AI_CHANGES.md
           fi
 
+      # שלב 2: יצירת עץ מבנה הפרויקט המלא
+      - name: Generate Project Tree
+        run: |
+          sudo apt-get update && sudo apt-get install -y tree
+
+          echo "# 🌳 מבנה עץ הפרויקט (Project Tree)" > PROJECT_TREE.md
+          echo "> מתעדכן אוטומטית בכל שינוי עבור AI Context." >> PROJECT_TREE.md
+          echo "" >> PROJECT_TREE.md
+          echo '```text' >> PROJECT_TREE.md
+          # מסננים קבצי מערכת ותרגומים כבדים שלא רלוונטיים ל-AI
+          tree -a -I ".git|.gradle|build|.idea|changelogs" --dirsfirst >> PROJECT_TREE.md
+          echo '```' >> PROJECT_TREE.md
+
+      # שלב 3: שמירה ודחיפה של שני הקבצים
       - name: Commit and Push
         run: |
           git config --global user.name "github-actions[bot]"
           git config --global user.email "github-actions[bot]@users.noreply.github.com"
-          git add AI_CHANGES.md
-          git commit -m "docs: update AI_CHANGES.md [skip ci]" || exit 0
+          git add AI_CHANGES.md PROJECT_TREE.md
+          git commit -m "docs: auto-update AI_CHANGES & PROJECT_TREE [skip ci]" || exit 0
           git push
