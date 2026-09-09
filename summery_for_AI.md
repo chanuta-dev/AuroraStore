@@ -60,3 +60,6 @@ The primary purpose of this fork is to operate as a **curated, filtered, and hyb
 3. Compares latest available tag vs local `BuildConfig.VERSION_NAME`.
 4. If newer version exists, presents Compose `UpdateAvailableDialog` showing release notes and pre-release tag if applicable.
 5. Upon user confirmation, `AppSelfUpdater` downloads the release APK asset and prompts Android package installation.
+
+---
+test
