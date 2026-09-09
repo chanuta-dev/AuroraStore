@@ -191,17 +191,27 @@ class ComposeActivity : FragmentActivity() {
     }
 
     private fun resolveStartDestination(): Screen {
-        // Parcel-based navigation (e.g. from NotificationUtil or DeepLinkConfirmActivity, which
-        // owns the external ACTION_VIEW market:// and play.google.com deep links)
-        IntentCompat.getParcelableExtra(intent, Screen.PARCEL_KEY, Screen::class.java)
-            ?.let { return it }
+        if (!Preferences.getBoolean(this, Preferences.PREFERENCE_INTRO)) {
+            return Screen.Onboarding
+        }
 
-        // SEND / SHOW_APP_INFO — getPackageName() handles both
-        intent.getPackageName()?.let { return Screen.AppDetails(it) }
+        // 1. קריאת שם החבילה מדיפ-לינק או Intent חיצוני
+        val targetPackage = intent.getPackageName()
+        if (!targetPackage.isNullOrBlank()) {
+            // ניתוב דרך Splash כדי להבטיח שסשן ההתחברות וה-Whitelist נטענו
+            return Screen.Splash(packageName = targetPackage)
+        }
+
+        // 2. ניווט מבוסס Parcel (התראות / מסכים פנימיים)
+        IntentCompat.getParcelableExtra(intent, Screen.PARCEL_KEY, Screen::class.java)?.let { screen ->
+            if (screen is Screen.AppDetails) {
+                return Screen.Splash(packageName = screen.packageName)
+            }
+            return screen
+        }
 
         return defaultStart()
     }
-
     private fun defaultStart(): Screen = when {
         !Preferences.getBoolean(this, Preferences.PREFERENCE_INTRO) -> Screen.Onboarding
         else -> Screen.Splash()
