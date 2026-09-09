@@ -1,3 +1,111 @@
+## 📅 עדכון: 2026-09-09 16:21:24 UTC
+**הודעת קומיט:** Update DeepLinkConfirmActivity.kt
+**קוד שינוי:** `f36abf548675deeb5f2db6c3a8e4c7d64a71f2ee`
+
+### 📂 קבצים שהושפעו:
+M	app/src/main/java/com/aurora/store/DeepLinkConfirmActivity.kt
+
+### 📝 פירוט השינויים (Diff):
+```diff
+diff --git a/app/src/main/java/com/aurora/store/DeepLinkConfirmActivity.kt b/app/src/main/java/com/aurora/store/DeepLinkConfirmActivity.kt
+index d7543fc..a0ec1ef 100644
+--- a/app/src/main/java/com/aurora/store/DeepLinkConfirmActivity.kt
++++ b/app/src/main/java/com/aurora/store/DeepLinkConfirmActivity.kt
+@@ -1,5 +1,6 @@
+ /*
+  * SPDX-FileCopyrightText: 2026 Aurora OSS
++ * SPDX-FileCopyrightText: 2025 The Calyx Institute
+  * SPDX-License-Identifier: GPL-3.0-or-later
+  */
+ 
+@@ -7,21 +8,16 @@ package com.aurora.store
+ 
+ import android.content.Intent
+ import android.os.Bundle
++import android.widget.Toast
+ import androidx.activity.compose.setContent
+ import androidx.activity.enableEdgeToEdge
+ import androidx.fragment.app.FragmentActivity
++import com.aurora.gplayapi.WhitelistManager
+ import com.aurora.store.compose.navigation.Screen
+ import com.aurora.store.compose.theme.AuroraTheme
+ import com.aurora.store.compose.ui.sheets.DeepLinkConfirmSheet
+ import com.aurora.store.util.Preferences
+ 
+-/**
+- * Translucent trampoline that gates external [Intent.ACTION_VIEW] app/developer listing deep links
+- * (market:// and play.google.com links). These are the vector ads exploit to launch Aurora into a
+- * listing without intent, so a Play Store-style confirmation sheet is shown floating over the
+- * launching app before forwarding to [ComposeActivity]. When the user has opted out, or the intent
+- * doesn't resolve to a listing, it forwards immediately without prompting.
+- */
+ class DeepLinkConfirmActivity : FragmentActivity() {
+ 
+     override fun onCreate(savedInstanceState: Bundle?) {
+@@ -29,6 +25,19 @@ class DeepLinkConfirmActivity : FragmentActivity() {
+         super.onCreate(savedInstanceState)
+ 
+         val target = resolveDeepLink()
++
++        // --- שער אבטחה ראשון: חסימה מיידית של אפליקציה שאינה ברשימה הלבנה ---
++        if (target is Screen.AppDetails) {
++            if (WhitelistManager.authorizedPackages.isNotEmpty() &&
++                !WhitelistManager.isAuthorized(target.packageName)
++            ) {
++                Toast.makeText(this, "אפליקציה זו אינה מורשית", Toast.LENGTH_LONG).show()
++                finish()
++                return
++            }
++        }
++        // ---------------------------------------------------------------------
++
+         val shouldConfirm = target != null &&
+             Preferences.getBoolean(this, Preferences.PREFERENCE_CONFIRM_EXTERNAL_DEEPLINK, true)
+ 
+@@ -50,13 +59,6 @@ class DeepLinkConfirmActivity : FragmentActivity() {
+         }
+     }
+ 
+-    /**
+-     * Resolves the listing requested by the incoming ACTION_VIEW intent, or null when the intent
+-     * carries no id. The action keyword ("details", "dev" or "developer") is the last path segment
+-     * for play.google.com links and the host for market:// links. Both "dev" and "developer" links
+-     * may carry either a numeric developer id (curated developer stream) or a developer name
+-     * (publisher search), so the id is parsed to decide which one to open.
+-     */
+     private fun resolveDeepLink(): Screen? {
+         if (intent.action != Intent.ACTION_VIEW) return null
+ 
+@@ -72,11 +74,6 @@ class DeepLinkConfirmActivity : FragmentActivity() {
+         }
+     }
+ 
+-    /**
+-     * Best-effort human-readable name of the app that fired the intent, derived from the activity
+-     * referrer. Resolves an android-app:// referrer to its app label, falling back to the raw host.
+-     * Returns null when no referrer is available.
+-     */
+     private fun resolveReferrerLabel(): String? {
+         val ref = referrer ?: return null
+         val pkg = if (ref.scheme == "android-app") ref.host else null
+@@ -94,9 +91,10 @@ class DeepLinkConfirmActivity : FragmentActivity() {
+         startActivity(
+             Intent(this, ComposeActivity::class.java).apply {
+                 target?.let { putExtra(Screen.PARCEL_KEY, it) }
+-                // Start ComposeActivity fresh so the parcel is honoured even when Aurora is already
+-                // running; without this a reused instance keeps its current screen. Mirrors the
+-                // deep-link PendingIntents in NotificationUtil.
++                // העברה מפורשת של ה-packageName כמחרוזת למניעת כשלים בסריאליזציה
++                if (target is Screen.AppDetails) {
++                    putExtra("packageName", target.packageName)
++                }
+                 flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK
+             }
+         )
+```
+
+---
+
 ## 📅 עדכון: 2026-09-09 15:43:56 UTC
 **הודעת קומיט:** Merge pull request #21 from chanuta-dev/update-summary-docs
 
