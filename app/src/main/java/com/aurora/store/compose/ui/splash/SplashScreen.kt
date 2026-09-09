@@ -108,8 +108,7 @@ fun SplashScreen(
             googleLoading = false
         }
     }
-
-    LaunchedEffect(authState) {
+LaunchedEffect(authState) {
         when (val state = authState) {
             AuthState.Valid, AuthState.SignedIn -> {
                 anonymousLoading = false
@@ -119,9 +118,26 @@ fun SplashScreen(
                     !deepLinkDevId.isNullOrBlank() -> onNavigateTo(
                         Destination.DevProfile(deepLinkDevId)
                     )
-                    !deepLinkPackageName.isNullOrBlank() -> onNavigateTo(
-                        Destination.AppDetails(deepLinkPackageName)
-                    )
+                    !deepLinkPackageName.isNullOrBlank() -> {
+                        // בדיקת הרשאה הרמטית: האם האפליקציה ברשימה הלבנה?
+                        if (com.aurora.gplayapi.WhitelistManager.isAuthorized(deepLinkPackageName)) {
+                            onNavigateTo(Destination.AppDetails(deepLinkPackageName))
+                        } else {
+                            android.widget.Toast.makeText(
+                                context,
+                                "אפליקציה זו אינה מורשית",
+                                android.widget.Toast.LENGTH_LONG
+                            ).show()
+                            onNavigateTo(
+                                Destination.Main(
+                                    Preferences.getInteger(
+                                        context,
+                                        Preferences.PREFERENCE_DEFAULT_SELECTED_TAB
+                                    )
+                                )
+                            )
+                        }
+                    }
                     else -> onNavigateTo(
                         Destination.Main(
                             Preferences.getInteger(
