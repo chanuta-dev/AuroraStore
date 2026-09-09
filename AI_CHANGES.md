@@ -1,3 +1,32 @@
+## 📅 עדכון: 2026-09-09 15:43:56 UTC
+**הודעת קומיט:** Merge pull request #21 from chanuta-dev/update-summary-docs
+
+🤖 AI Update: docs: update summery_for_AI.md with latest changes from AI_CHANGES.md
+**קוד שינוי:** `e75935342804635f9fc9988e79d0b9d82e0ffba3`
+
+### 📂 קבצים שהושפעו:
+M	summery_for_AI.md
+
+### 📝 פירוט השינויים (Diff):
+```diff
+diff --git a/summery_for_AI.md b/summery_for_AI.md
+index 8a5715a..c991770 100644
+--- a/summery_for_AI.md
++++ b/summery_for_AI.md
+@@ -62,4 +62,8 @@ The primary purpose of this fork is to operate as a **curated, filtered, and hyb
+ 5. Upon user confirmation, `AppSelfUpdater` downloads the release APK asset and prompts Android package installation.
+ 
+ ---
+-test
++
++## 📈 Progress & Recent Modifications
++- Updated build & workflow automation (`release.yml`, `ai_agent.yml`, `ai_tracker.yml`).
++- Added support for auto-tracking project tree and AI changes.
++- Integrated beta and production release options in GitHub Actions workflows.
+```
+
+---
+
 ## 📅 עדכון: 2026-09-09 14:35:02 UTC
 **הודעת קומיט:** Fix permission type usage in AppDetailsScreen
 **קוד שינוי:** `191f37e977b956acde7f4c6af51d3c4d07bb8dd1`
