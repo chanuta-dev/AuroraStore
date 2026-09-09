@@ -1,3 +1,60 @@
+## 📅 עדכון: 2026-09-09 16:28:12 UTC
+**הודעת קומיט:** Update SplashScreen.kt
+**קוד שינוי:** `0fbffc98a9346a6279f7b1d5f232a2034d74fd41`
+
+### 📂 קבצים שהושפעו:
+M	app/src/main/java/com/aurora/store/compose/ui/splash/SplashScreen.kt
+
+### 📝 פירוט השינויים (Diff):
+```diff
+diff --git a/app/src/main/java/com/aurora/store/compose/ui/splash/SplashScreen.kt b/app/src/main/java/com/aurora/store/compose/ui/splash/SplashScreen.kt
+index 43a7ba0..2e176bd 100644
+--- a/app/src/main/java/com/aurora/store/compose/ui/splash/SplashScreen.kt
++++ b/app/src/main/java/com/aurora/store/compose/ui/splash/SplashScreen.kt
+@@ -108,8 +108,7 @@ fun SplashScreen(
+             googleLoading = false
+         }
+     }
+-
+-    LaunchedEffect(authState) {
++LaunchedEffect(authState) {
+         when (val state = authState) {
+             AuthState.Valid, AuthState.SignedIn -> {
+                 anonymousLoading = false
+@@ -119,9 +118,26 @@ fun SplashScreen(
+                     !deepLinkDevId.isNullOrBlank() -> onNavigateTo(
+                         Destination.DevProfile(deepLinkDevId)
+                     )
+-                    !deepLinkPackageName.isNullOrBlank() -> onNavigateTo(
+-                        Destination.AppDetails(deepLinkPackageName)
+-                    )
++                    !deepLinkPackageName.isNullOrBlank() -> {
++                        // בדיקת הרשאה הרמטית: האם האפליקציה ברשימה הלבנה?
++                        if (com.aurora.gplayapi.WhitelistManager.isAuthorized(deepLinkPackageName)) {
++                            onNavigateTo(Destination.AppDetails(deepLinkPackageName))
++                        } else {
++                            android.widget.Toast.makeText(
++                                context,
++                                "אפליקציה זו אינה מורשית",
++                                android.widget.Toast.LENGTH_LONG
++                            ).show()
++                            onNavigateTo(
++                                Destination.Main(
++                                    Preferences.getInteger(
++                                        context,
++                                        Preferences.PREFERENCE_DEFAULT_SELECTED_TAB
++                                    )
++                                )
++                            )
++                        }
++                    }
+                     else -> onNavigateTo(
+                         Destination.Main(
+                             Preferences.getInteger(
+```
+
+---
+
 ## 📅 עדכון: 2026-09-09 16:26:11 UTC
 **הודעת קומיט:** Update ComposeActivity.kt
 **קוד שינוי:** `ac1d5681e8105975aa25dd22c60416e9106f8c65`
