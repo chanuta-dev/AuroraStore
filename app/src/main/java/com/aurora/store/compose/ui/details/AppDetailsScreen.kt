@@ -303,7 +303,7 @@ private fun ScreenContentApp(
     onNavigateTo: (Destination) -> Unit = {},
     onLoadMoreCluster: (cluster: StreamCluster) -> Unit = {},
     accounts: List<Account> = emptyList(),
-    onDownload = { requestedApp: App -> viewModelEnqueue(requestedApp) },
+    onDownload: (requestedApp: App) -> Unit = {},
     onDownloadWith: (requestedApp: App, accountId: String) -> Unit = { _, _ -> },
     onFavorite: () -> Unit = {},
     onCancelDownload: () -> Unit = {},
@@ -396,7 +396,7 @@ private fun ScreenContentApp(
         } else {
             isChecking = false
             val requiredPermissions = setOfNotNull(
-                PermissionType.INSTALL_UNKNOWN_APPS,
+                PermissionType.INSTALL_UNKNOWNAPPS ?: PermissionType.INSTALL_UNKNOWN_APPS,
                 if (app.fileList.requiresObbDir()) PermissionType.STORAGE_MANAGER else null,
                 if (app.fileList.requiresObbDir()) PermissionType.EXTERNAL_STORAGE else null
             )
@@ -860,13 +860,13 @@ private fun AppDetailsScreenPreview(@PreviewParameter(AppPreviewProvider::class)
 @PreviewWrapper(ThemePreviewProvider::class)
 @Preview
 @Composable
-private fun ScreenContentLoading() {
+private fun AppDetailsScreenPreviewLoading() {
     ScreenContentLoading()
 }
 
 @PreviewWrapper(ThemePreviewProvider::class)
 @Preview
 @Composable
-private fun ScreenContentError() {
+private fun AppDetailsScreenPreviewError() {
     ScreenContentError()
 }
