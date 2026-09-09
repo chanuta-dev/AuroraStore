@@ -1,3 +1,27 @@
+## 📅 עדכון: 2026-09-09 14:17:22 UTC
+**הודעת קומיט:** Update summery_for_AI.md
+**קוד שינוי:** `aef4e99b225eb1796b6ec8a57e9fdf26a74ab457`
+
+### 📂 קבצים שהושפעו:
+M	summery_for_AI.md
+
+### 📝 פירוט השינויים (Diff):
+```diff
+diff --git a/summery_for_AI.md b/summery_for_AI.md
+index aac8787..8a5715a 100644
+--- a/summery_for_AI.md
++++ b/summery_for_AI.md
+@@ -60,3 +60,6 @@ The primary purpose of this fork is to operate as a **curated, filtered, and hyb
+ 3. Compares latest available tag vs local `BuildConfig.VERSION_NAME`.
+ 4. If newer version exists, presents Compose `UpdateAvailableDialog` showing release notes and pre-release tag if applicable.
+ 5. Upon user confirmation, `AppSelfUpdater` downloads the release APK asset and prompts Android package installation.
++
++---
++test
+```
+
+---
+
 ## 📅 עדכון: 2026-09-08 00:25:04 UTC
 **הודעת קומיט:** Update build.gradle.kts
 **קוד שינוי:** `04fc17ff9a7d544b2bf5439d6328e3263d09a82f`
