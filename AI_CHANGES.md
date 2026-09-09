@@ -1,3 +1,90 @@
+## 📅 עדכון: 2026-09-09 14:21:06 UTC
+**הודעת קומיט:** Update AppDetailsScreen.kt
+**קוד שינוי:** `c1c323d4536a2ec1199991f778a144f8e1b3b057`
+
+### 📂 קבצים שהושפעו:
+M	app/src/main/java/com/aurora/store/compose/ui/details/AppDetailsScreen.kt
+
+### 📝 פירוט השינויים (Diff):
+```diff
+diff --git a/app/src/main/java/com/aurora/store/compose/ui/details/AppDetailsScreen.kt b/app/src/main/java/com/aurora/store/compose/ui/details/AppDetailsScreen.kt
+index 2cfd35c..a5bacd7 100644
+--- a/app/src/main/java/com/aurora/store/compose/ui/details/AppDetailsScreen.kt
++++ b/app/src/main/java/com/aurora/store/compose/ui/details/AppDetailsScreen.kt
+@@ -88,11 +88,8 @@ import com.aurora.store.compose.ui.details.composable.DataSafety
+ import com.aurora.store.compose.ui.details.composable.Details
+ import com.aurora.store.compose.ui.details.composable.DeveloperDetails
+ import com.aurora.store.compose.ui.details.composable.Privacy
+-import com.aurora.store.compose.ui.details.composable.RatingAndReviews
+-import com.aurora.store.compose.ui.details.composable.Screenshots
+ import com.aurora.store.compose.ui.details.composable.Tags
+ import com.aurora.store.compose.ui.details.composable.Testing
+-import com.aurora.store.compose.ui.details.composable.UserReview
+ import com.aurora.store.compose.ui.details.menu.AppDetailsMenu
+ import com.aurora.store.compose.ui.details.menu.MenuItem
+ import com.aurora.store.compose.ui.details.navigation.ExtraScreen
+@@ -306,7 +303,7 @@ private fun ScreenContentApp(
+     onNavigateTo: (Destination) -> Unit = {},
+     onLoadMoreCluster: (cluster: StreamCluster) -> Unit = {},
+     accounts: List<Account> = emptyList(),
+-    onDownload: (requestedApp: App) -> Unit = {},
++    onDownload = { requestedApp: App -> viewModelEnqueue(requestedApp) },
+     onDownloadWith: (requestedApp: App, accountId: String) -> Unit = { _, _ -> },
+     onFavorite: () -> Unit = {},
+     onCancelDownload: () -> Unit = {},
+@@ -637,32 +634,6 @@ private fun ScreenContentApp(
+                         )
+                     }
+ 
+-                    item {
+-                        Screenshots(
+-                            screenshots = app.screenshots,
+-                            onNavigateToScreenshot = { showExtraPane(ExtraScreen.Screenshot(it)) }
+-                        )
+-                    }
+-
+-                    item {
+-                        RatingAndReviews(
+-                            rating = app.rating,
+-                            featuredReviews = featuredReviews,
+-                            onNavigateToDetailsReview = { showExtraPane(ExtraScreen.Review) }
+-                        )
+-                    }
+-
+-                    item {
+-                        // Reviews can only be submitted by personal accounts for installed apps.
+-                        if (!isAnonymous && app.isInstalled) {
+-                            UserReview(
+-                                review = userReview,
+-                                onSubmit = onSubmitReview,
+-                                onDelete = onDeleteReview
+-                            )
+-                        }
+-                    }
+-
+                     item {
+                         if (!isAnonymous && app.testingProgram?.isAvailable == true) {
+                             Testing(
+@@ -889,13 +860,13 @@ private fun AppDetailsScreenPreview(@PreviewParameter(AppPreviewProvider::class)
+ @PreviewWrapper(ThemePreviewProvider::class)
+ @Preview
+ @Composable
+-private fun AppDetailsScreenPreviewLoading() {
++private fun ScreenContentLoading() {
+     ScreenContentLoading()
+ }
+ 
+ @PreviewWrapper(ThemePreviewProvider::class)
+ @Preview
+ @Composable
+-private fun AppDetailsScreenPreviewError() {
++private fun ScreenContentError() {
+     ScreenContentError()
+ }
+```
+
+---
+
 ## 📅 עדכון: 2026-09-09 14:17:22 UTC
 **הודעת קומיט:** Update summery_for_AI.md
 **קוד שינוי:** `aef4e99b225eb1796b6ec8a57e9fdf26a74ab457`
