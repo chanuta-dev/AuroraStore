@@ -166,7 +166,7 @@ fun AppRequestScreen(
                 singleLine = true,
                 leadingIcon = {
                     Icon(
-                        painter = painterResource(R.drawable.ic_search),
+                        painter = painterResource(R.drawable.ic_round_search),
                         contentDescription = null
                     )
                 },
