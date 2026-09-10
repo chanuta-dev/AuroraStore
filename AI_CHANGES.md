@@ -1,3 +1,77 @@
+## 📅 עדכון: 2026-09-10 16:44:16 UTC
+**הודעת קומיט:** Refactor RequestAppFooterCard to use simplified imports
+**קוד שינוי:** `725148baa221690cf406b89bc2f31081807eedd8`
+
+### 📂 קבצים שהושפעו:
+M	app/src/main/java/com/aurora/store/compose/ui/search/SearchScreen.kt
+
+### 📝 פירוט השינויים (Diff):
+```diff
+diff --git a/app/src/main/java/com/aurora/store/compose/ui/search/SearchScreen.kt b/app/src/main/java/com/aurora/store/compose/ui/search/SearchScreen.kt
+index e3da3eb..65e94be 100644
+--- a/app/src/main/java/com/aurora/store/compose/ui/search/SearchScreen.kt
++++ b/app/src/main/java/com/aurora/store/compose/ui/search/SearchScreen.kt
+@@ -85,6 +85,15 @@ import kotlin.uuid.Uuid
+ import kotlinx.coroutines.flow.MutableStateFlow
+ import kotlinx.coroutines.flow.collectLatest
+ import kotlinx.coroutines.launch
++import androidx.compose.foundation.clickable
++import androidx.compose.foundation.layout.Row
++import androidx.compose.foundation.shape.RoundedCornerShape
++import androidx.compose.material3.Button
++import androidx.compose.material3.Card
++import androidx.compose.material3.CardDefaults
++import androidx.compose.material3.MaterialTheme
++import androidx.compose.ui.text.font.FontWeight
++import androidx.compose.ui.unit.dp
+ 
+ @Composable
+ fun SearchScreen(
+@@ -471,17 +480,18 @@ private fun SearchScreenPreview(@PreviewParameter(AppPreviewProvider::class) app
+     val results = MutableStateFlow(PagingData.from(apps)).collectAsLazyPagingItems()
+     ScreenContent(results = results)
+ }
++
+ @Composable
+ private fun RequestAppFooterCard(onAction: () -> Unit) {
+-    androidx.compose.material3.Card(
++    Card(
+         modifier = Modifier
+             .fillMaxWidth()
+             .padding(vertical = 12.dp)
+-            .androidx.compose.foundation.clickable { onAction() },
+-        colors = androidx.compose.material3.CardDefaults.cardColors(
++            .clickable { onAction() },
++        colors = CardDefaults.cardColors(
+             containerColor = MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.5f)
+         ),
+-        shape = androidx.compose.foundation.shape.RoundedCornerShape(12.dp)
++        shape = RoundedCornerShape(12.dp)
+     ) {
+         Row(
+             modifier = Modifier
+@@ -493,7 +503,7 @@ private fun RequestAppFooterCard(onAction: () -> Unit) {
+             Column(modifier = Modifier.weight(1f)) {
+                 Text(
+                     text = "לא מצאת את מה שחיפשת?",
+-                    fontWeight = androidx.compose.ui.text.font.FontWeight.Bold,
++                    fontWeight = FontWeight.Bold,
+                     style = MaterialTheme.typography.bodyMedium
+                 )
+                 Text(
+@@ -502,7 +512,7 @@ private fun RequestAppFooterCard(onAction: () -> Unit) {
+                     color = MaterialTheme.colorScheme.onSurfaceVariant
+                 )
+             }
+-            androidx.compose.material3.Button(onClick = onAction) {
++            Button(onClick = onAction) {
+                 Text("בקש")
+             }
+         }
+```
+
+---
+
 ## 📅 עדכון: 2026-09-10 16:33:49 UTC
 **הודעת קומיט:** Implement RequestAppFooterCard in SearchScreen
 
