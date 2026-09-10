@@ -272,6 +272,18 @@ private fun ScreenContent(
                                             )
                                         }
                                     }
+                                    // --- כרטיס בקשה בסוף תוצאות החיפוש ---
+                                    if (isSearching && results.itemCount > 0) {
+                                        item(key = "request_app_footer") {
+                                            RequestAppFooterCard(
+                                                onAction = {
+                                                    onNavigateTo(
+                                                        Destination.AppRequest(textFieldState.text.toString())
+                                                    )
+                                                }
+                                            )
+                                        }
+                                    }
                                 }
                                 ScrollHint(
                                     listState = listState,
@@ -458,4 +470,41 @@ private fun SearchScreenPreview(@PreviewParameter(AppPreviewProvider::class) app
     val apps = List(10) { app.copy(id = Random.nextInt()) }
     val results = MutableStateFlow(PagingData.from(apps)).collectAsLazyPagingItems()
     ScreenContent(results = results)
+}
+@Composable
+private fun RequestAppFooterCard(onAction: () -> Unit) {
+    androidx.compose.material3.Card(
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(vertical = 12.dp)
+            .androidx.compose.foundation.clickable { onAction() },
+        colors = androidx.compose.material3.CardDefaults.cardColors(
+            containerColor = MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.5f)
+        ),
+        shape = androidx.compose.foundation.shape.RoundedCornerShape(12.dp)
+    ) {
+        Row(
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(16.dp),
+            verticalAlignment = Alignment.CenterVertically,
+            horizontalArrangement = Arrangement.SpaceBetween
+        ) {
+            Column(modifier = Modifier.weight(1f)) {
+                Text(
+                    text = "לא מצאת את מה שחיפשת?",
+                    fontWeight = androidx.compose.ui.text.font.FontWeight.Bold,
+                    style = MaterialTheme.typography.bodyMedium
+                )
+                Text(
+                    text = "חפש בכל החנות ובקש הוספה למערכת",
+                    style = MaterialTheme.typography.bodySmall,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant
+                )
+            }
+            androidx.compose.material3.Button(onClick = onAction) {
+                Text("בקש")
+            }
+        }
+    }
 }
