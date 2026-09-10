@@ -315,7 +315,7 @@ private fun AppIconWithPixelation(
             .background(MaterialTheme.colorScheme.primaryContainer),
         contentAlignment = Alignment.Center
     ) {
-        // גיבוי תמיד: אות ראשונה יפה במידה והתמונה חסומה ברשת/בנטפרי
+        // גיבוי תמיד: אות ראשונה אם התמונה לא זמינה או חסומה
         Text(
             text = title.take(1).uppercase(),
             fontWeight = FontWeight.Bold,
@@ -324,12 +324,9 @@ private fun AppIconWithPixelation(
         )
 
         if (iconUrl.isNotBlank()) {
-            // אם מפוקסל: נדגום מגוגל תמונה זעירה (s12) ונמתח אותה ללא החלקה לקבלת פסיפס פיקסלים מושלם
-            val finalUrl = if (isPixelated && iconUrl.contains("=")) {
-                iconUrl.substringBeforeLast("=") + "=s12"
-            } else {
-                iconUrl
-            }
+            // חיתוך סיומת קודמת אם קיימת, והוספת =s8 לקבלת 8x8 פיקסלים בלבד!
+            val cleanUrl = if (iconUrl.contains("=")) iconUrl.substringBeforeLast("=") else iconUrl
+            val finalUrl = if (isPixelated) "$cleanUrl=s8" else "$cleanUrl=s128"
 
             AsyncImage(
                 modifier = Modifier.fillMaxSize(),
@@ -339,6 +336,7 @@ private fun AppIconWithPixelation(
                     .build(),
                 contentDescription = null,
                 contentScale = ContentScale.Crop,
+                // ביטול החלקה במתיחה - מייצר קוביות פיקסלים חדות וגדולות
                 filterQuality = if (isPixelated) FilterQuality.None else FilterQuality.Medium
             )
         }
