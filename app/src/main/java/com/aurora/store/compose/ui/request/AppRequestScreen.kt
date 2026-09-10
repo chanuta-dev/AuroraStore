@@ -18,12 +18,10 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
-import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material3.Button
-import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Checkbox
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.ExperimentalMaterial3Api
@@ -57,8 +55,9 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
-import coil.compose.SubcomposeAsyncImage
-import coil.request.ImageRequest
+import coil3.compose.AsyncImage
+import coil3.request.ImageRequest
+import coil3.request.crossfade
 import com.aurora.store.R
 import com.aurora.store.viewmodel.request.AppRequestItem
 import com.aurora.store.viewmodel.request.AppRequestViewModel
@@ -301,7 +300,7 @@ private fun AppRequestRow(
 }
 
 /**
- * מציג אייקון מפוקסל אמיתי בסגנון נטפרי על ידי דגימת 10x10 פיקסלים ומתיחה ללא החלקה
+ * מציג אייקון מפוקסל אמיתי בסגנון נטפרי
  */
 @Composable
 private fun AppIconWithPixelation(
@@ -309,54 +308,41 @@ private fun AppIconWithPixelation(
     iconUrl: String,
     isPixelated: Boolean
 ) {
-    val context = LocalContext.current
-
-    val imageRequest = remember(iconUrl, isPixelated) {
-        ImageRequest.Builder(context)
-            .data(iconUrl)
-            .crossfade(true)
-            .apply {
-                if (isPixelated) {
-                    // כיווץ ל-10x10 כדי לייצר פיקסלים גסים ומטושטשים
-                    size(10, 10)
-                }
-            }
-            .build()
-    }
-
-    SubcomposeAsyncImage(
-        model = imageRequest,
-        contentDescription = null,
-        // ביטול החלקה במתיחה ליצירת אפקט פסיפס / פיקסלים חדים
-        filterQuality = if (isPixelated) FilterQuality.None else FilterQuality.Medium,
-        contentScale = ContentScale.Crop,
+    Box(
         modifier = Modifier
             .size(46.dp)
-            .clip(RoundedCornerShape(10.dp)),
-        error = {
-            // גיבוי: אות ראשונה בתוך ריבוע אם התמונה חסומה בנטפרי/ברשת
-            Box(
-                modifier = Modifier
-                    .fillMaxSize()
-                    .background(MaterialTheme.colorScheme.primaryContainer),
-                contentAlignment = Alignment.Center
-            ) {
-                Text(
-                    text = title.take(1).uppercase(),
-                    fontWeight = FontWeight.Bold,
-                    fontSize = 18.sp,
-                    color = MaterialTheme.colorScheme.onPrimaryContainer
-                )
+            .clip(RoundedCornerShape(10.dp))
+            .background(MaterialTheme.colorScheme.primaryContainer),
+        contentAlignment = Alignment.Center
+    ) {
+        // גיבוי תמיד: אות ראשונה יפה במידה והתמונה חסומה ברשת/בנטפרי
+        Text(
+            text = title.take(1).uppercase(),
+            fontWeight = FontWeight.Bold,
+            fontSize = 18.sp,
+            color = MaterialTheme.colorScheme.onPrimaryContainer
+        )
+
+        if (iconUrl.isNotBlank()) {
+            // אם מפוקסל: נדגום מגוגל תמונה זעירה (s12) ונמתח אותה ללא החלקה לקבלת פסיפס פיקסלים מושלם
+            val finalUrl = if (isPixelated && iconUrl.contains("=")) {
+                iconUrl.substringBeforeLast("=") + "=s12"
+            } else {
+                iconUrl
             }
-        },
-        loading = {
-            Box(
-                modifier = Modifier
-                    .fillMaxSize()
-                    .background(MaterialTheme.colorScheme.surfaceVariant)
+
+            AsyncImage(
+                modifier = Modifier.fillMaxSize(),
+                model = ImageRequest.Builder(LocalContext.current)
+                    .data(finalUrl)
+                    .crossfade(true)
+                    .build(),
+                contentDescription = null,
+                contentScale = ContentScale.Crop,
+                filterQuality = if (isPixelated) FilterQuality.None else FilterQuality.Medium
             )
         }
-    )
+    }
 }
 
 @Composable
