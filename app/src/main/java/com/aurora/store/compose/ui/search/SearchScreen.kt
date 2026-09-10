@@ -87,7 +87,10 @@ import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.launch
 
 @Composable
-fun SearchScreen(viewModel: SearchViewModel = hiltViewModel()) {
+fun SearchScreen(
+    viewModel: SearchViewModel = hiltViewModel(),
+    onNavigateTo: (Destination) -> Unit = {}
+) {
     val suggestions by viewModel.suggestions.collectAsStateWithLifecycle()
     val results = viewModel.apps.collectAsLazyPagingItems()
 
@@ -102,6 +105,7 @@ fun SearchScreen(viewModel: SearchViewModel = hiltViewModel()) {
         onFetchSuggestions = onFetchSuggestionsCallback,
         onFilter = { filter -> viewModel.filterResults(filter) },
         isAnonymous = viewModel.authProvider.isAnonymous
+        onNavigateTo = onNavigateTo
     )
 }
 
@@ -113,6 +117,7 @@ private fun ScreenContent(
     onSearch: (String) -> Unit = {},
     onFilter: (filter: SearchFilter) -> Unit = {},
     isAnonymous: Boolean = true
+    nNavigateTo: (Destination) -> Unit = {}
 ) {
     val activity = LocalActivity.current as? ComponentActivity
     val textFieldState = rememberTextFieldState()
@@ -238,7 +243,13 @@ private fun ScreenContent(
                             Placeholder(
                                 modifier = Modifier.padding(paddingValues),
                                 painter = painterResource(R.drawable.ic_disclaimer),
-                                message = stringResource(R.string.no_apps_available)
+                                message = stringResource(R.string.no_apps_available),
+                                actionLabel = "בקש הוספת אפליקציה לחנות",
+                                onAction = {
+                                    onNavigateTo(
+                                        Destination.AppRequest(textFieldState.text.toString())
+                                    )
+                                }
                             )
                         } else {
                             val listState = rememberLazyListState()
