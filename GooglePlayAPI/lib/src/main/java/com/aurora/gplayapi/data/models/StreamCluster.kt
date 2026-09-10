@@ -19,18 +19,20 @@ data class StreamCluster(
     val clusterSubtitle: String = "",
     val clusterNextPageUrl: String = "",
     val clusterBrowseUrl: String = "",
-    // שינוי 1: הפכנו את ה-val ל-var כדי שנוכל לעדכן את הרשימה
-    var clusterAppList: List<App> = emptyList()
+    var clusterAppList: List<App> = emptyList(),
+    // דגל שמאפשר לכבות את הסינון אך ורק במסך הבקשות (ברירת מחדל: תמיד מסונן!)
+    val filterWhitelist: Boolean = true
 ) : Parcelable {
 
-    // שינוי 2: הוספת בלוק init שחותך ומסנן את האפליקציות מיד עם קבלתן מהשרת
     init {
-        clusterAppList = if (WhitelistManager.authorizedPackages.isNotEmpty()) {
-            clusterAppList
-                .filter { WhitelistManager.isAuthorized(it.packageName) }
-                .distinctBy { it.packageName }
-        } else {
-            emptyList()
+        if (filterWhitelist) {
+            clusterAppList = if (WhitelistManager.authorizedPackages.isNotEmpty()) {
+                clusterAppList
+                    .filter { WhitelistManager.isAuthorized(it.packageName) }
+                    .distinctBy { it.packageName }
+            } else {
+                emptyList()
+            }
         }
     }
 
