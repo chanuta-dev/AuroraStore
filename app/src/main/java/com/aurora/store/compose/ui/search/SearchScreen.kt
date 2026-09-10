@@ -85,6 +85,15 @@ import kotlin.uuid.Uuid
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.launch
+import androidx.compose.foundation.clickable
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material3.Button
+import androidx.compose.material3.Card
+import androidx.compose.material3.CardDefaults
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.unit.dp
 
 @Composable
 fun SearchScreen(
@@ -471,17 +480,18 @@ private fun SearchScreenPreview(@PreviewParameter(AppPreviewProvider::class) app
     val results = MutableStateFlow(PagingData.from(apps)).collectAsLazyPagingItems()
     ScreenContent(results = results)
 }
+
 @Composable
 private fun RequestAppFooterCard(onAction: () -> Unit) {
-    androidx.compose.material3.Card(
+    Card(
         modifier = Modifier
             .fillMaxWidth()
             .padding(vertical = 12.dp)
-            .androidx.compose.foundation.clickable { onAction() },
-        colors = androidx.compose.material3.CardDefaults.cardColors(
+            .clickable { onAction() },
+        colors = CardDefaults.cardColors(
             containerColor = MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.5f)
         ),
-        shape = androidx.compose.foundation.shape.RoundedCornerShape(12.dp)
+        shape = RoundedCornerShape(12.dp)
     ) {
         Row(
             modifier = Modifier
@@ -493,7 +503,7 @@ private fun RequestAppFooterCard(onAction: () -> Unit) {
             Column(modifier = Modifier.weight(1f)) {
                 Text(
                     text = "לא מצאת את מה שחיפשת?",
-                    fontWeight = androidx.compose.ui.text.font.FontWeight.Bold,
+                    fontWeight = FontWeight.Bold,
                     style = MaterialTheme.typography.bodyMedium
                 )
                 Text(
@@ -502,7 +512,7 @@ private fun RequestAppFooterCard(onAction: () -> Unit) {
                     color = MaterialTheme.colorScheme.onSurfaceVariant
                 )
             }
-            androidx.compose.material3.Button(onClick = onAction) {
+            Button(onClick = onAction) {
                 Text("בקש")
             }
         }
