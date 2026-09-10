@@ -23,6 +23,7 @@ sealed class Destination {
     data class AppUpdate(val update: Update) : Destination()
 
     data object Search : Destination()
+    data class AppRequest(val initialQuery: String = "") : Destination()
     data object Downloads : Destination()
 
     data class StreamBrowse(val cluster: StreamCluster) : Destination()
