@@ -1,3 +1,59 @@
+## 📅 עדכון: 2026-09-10 13:01:12 UTC
+**הודעת קומיט:** Modify StreamCluster to support app list updates
+
+Updated clusterAppList to allow modification and added filterWhitelist flag for controlling app filtering.
+**קוד שינוי:** `96c118a8298aaab4fd4b149cdbecff6245b5f8b9`
+
+### 📂 קבצים שהושפעו:
+M	GooglePlayAPI/lib/src/main/java/com/aurora/gplayapi/data/models/StreamCluster.kt
+
+### 📝 פירוט השינויים (Diff):
+```diff
+diff --git a/GooglePlayAPI/lib/src/main/java/com/aurora/gplayapi/data/models/StreamCluster.kt b/GooglePlayAPI/lib/src/main/java/com/aurora/gplayapi/data/models/StreamCluster.kt
+index ecde7fb..0046f0e 100644
+--- a/GooglePlayAPI/lib/src/main/java/com/aurora/gplayapi/data/models/StreamCluster.kt
++++ b/GooglePlayAPI/lib/src/main/java/com/aurora/gplayapi/data/models/StreamCluster.kt
+@@ -19,18 +19,20 @@ data class StreamCluster(
+     val clusterSubtitle: String = "",
+     val clusterNextPageUrl: String = "",
+     val clusterBrowseUrl: String = "",
+-    // שינוי 1: הפכנו את ה-val ל-var כדי שנוכל לעדכן את הרשימה
+-    var clusterAppList: List<App> = emptyList()
++    var clusterAppList: List<App> = emptyList(),
++    // דגל שמאפשר לכבות את הסינון אך ורק במסך הבקשות (ברירת מחדל: תמיד מסונן!)
++    val filterWhitelist: Boolean = true
+ ) : Parcelable {
+ 
+-    // שינוי 2: הוספת בלוק init שחותך ומסנן את האפליקציות מיד עם קבלתן מהשרת
+     init {
+-        clusterAppList = if (WhitelistManager.authorizedPackages.isNotEmpty()) {
+-            clusterAppList
+-                .filter { WhitelistManager.isAuthorized(it.packageName) }
+-                .distinctBy { it.packageName }
+-        } else {
+-            emptyList()
++        if (filterWhitelist) {
++            clusterAppList = if (WhitelistManager.authorizedPackages.isNotEmpty()) {
++                clusterAppList
++                    .filter { WhitelistManager.isAuthorized(it.packageName) }
++                    .distinctBy { it.packageName }
++            } else {
++                emptyList()
++            }
+         }
+     }
+ 
+@@ -41,4 +43,4 @@ data class StreamCluster(
+     fun hasNext(): Boolean {
+         return clusterNextPageUrl.isNotBlank()
+     }
+-}
+\ No newline at end of file
++}
+```
+
+---
+
 ## 📅 עדכון: 2026-09-09 16:28:12 UTC
 **הודעת קומיט:** Update SplashScreen.kt
 **קוד שינוי:** `0fbffc98a9346a6279f7b1d5f232a2034d74fd41`
