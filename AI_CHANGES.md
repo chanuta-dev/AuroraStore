@@ -1,3 +1,29 @@
+## 📅 עדכון: 2026-09-10 14:13:57 UTC
+**הודעת קומיט:** Update AppRequestScreen.kt
+**קוד שינוי:** `53307c4d3e1992b87fadf6c2d43fe71de177ad19`
+
+### 📂 קבצים שהושפעו:
+M	app/src/main/java/com/aurora/store/compose/ui/request/AppRequestScreen.kt
+
+### 📝 פירוט השינויים (Diff):
+```diff
+diff --git a/app/src/main/java/com/aurora/store/compose/ui/request/AppRequestScreen.kt b/app/src/main/java/com/aurora/store/compose/ui/request/AppRequestScreen.kt
+index 3175a04..db60e5d 100644
+--- a/app/src/main/java/com/aurora/store/compose/ui/request/AppRequestScreen.kt
++++ b/app/src/main/java/com/aurora/store/compose/ui/request/AppRequestScreen.kt
+@@ -166,7 +166,7 @@ fun AppRequestScreen(
+                 singleLine = true,
+                 leadingIcon = {
+                     Icon(
+-                        painter = painterResource(R.drawable.ic_search),
++                        painter = painterResource(R.drawable.ic_round_search),
+                         contentDescription = null
+                     )
+                 },
+```
+
+---
+
 ## 📅 עדכון: 2026-09-10 14:13:07 UTC
 **הודעת קומיט:** Fix syntax errors in SearchScreen.kt
 **קוד שינוי:** `cbff2f40059b86d62f7a12313c930566855bbc8e`
