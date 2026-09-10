@@ -50,7 +50,12 @@ class WebSearchHelper : BaseWebHelper(), SearchContract {
     }
 
     override fun searchResults(query: String, nextPageUrl: String): StreamBundle {
-        val cluster = search(query)
+        return searchResults(query, nextPageUrl, filterWhitelist = true)
+    }
+
+    // גרסה עם תמיכה בעקיפת סינון עבור מסך בקשת אפליקציות
+    fun searchResults(query: String, nextPageUrl: String = "", filterWhitelist: Boolean = true): StreamBundle {
+        val cluster = search(query, nextPageUrl, filterWhitelist)
 
         return StreamBundle(
             id = UUID.randomUUID().hashCode(),
@@ -62,15 +67,14 @@ class WebSearchHelper : BaseWebHelper(), SearchContract {
     }
 
     override fun nextStreamBundle(query: String, nextPageUrl: String): StreamBundle {
-        // Web does not support pagination in the same way as native API, there is only one stream.
         return StreamBundle.EMPTY
     }
 
     override fun nextStreamCluster(query: String, nextPageUrl: String): StreamCluster {
-        return search(query, nextPageUrl)
+        return search(query, nextPageUrl, filterWhitelist = true)
     }
 
-    fun search(query: String, nextPageUrl: String = ""): StreamCluster {
+    fun search(query: String, nextPageUrl: String = "", filterWhitelist: Boolean = true): StreamCluster {
         val response = execute(SearchQueryBuilder.build(query, nextPageUrl))
 
         var payload = response.dig<List<Any>>(
@@ -83,12 +87,10 @@ class WebSearchHelper : BaseWebHelper(), SearchContract {
             return StreamCluster.EMPTY
         }
 
-        // First stream is search stream, following are app streams (made-up names :p)
         if (payload.dig<String>(0, 1) != "Apps") {
             payload = payload.dig(1, 0)
         }
 
-        // Find only the package names, complete app info is fetched via AppDetailsHelper
         val packageNames: List<String> = payload.dig<List<Any>>(0, 0).let { entry ->
             entry.mapNotNull {
                 it.dig(12, 0)
@@ -105,7 +107,8 @@ class WebSearchHelper : BaseWebHelper(), SearchContract {
             id = UUID.randomUUID().hashCode(),
             clusterTitle = query,
             clusterNextPageUrl = nextPageToken,
-            clusterAppList = getAppDetails(packageNames)
+            clusterAppList = getAppDetails(packageNames),
+            filterWhitelist = filterWhitelist
         )
     }
 }
