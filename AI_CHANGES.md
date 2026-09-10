@@ -1,3 +1,40 @@
+## 📅 עדכון: 2026-09-10 14:13:07 UTC
+**הודעת קומיט:** Fix syntax errors in SearchScreen.kt
+**קוד שינוי:** `cbff2f40059b86d62f7a12313c930566855bbc8e`
+
+### 📂 קבצים שהושפעו:
+M	app/src/main/java/com/aurora/store/compose/ui/search/SearchScreen.kt
+
+### 📝 פירוט השינויים (Diff):
+```diff
+diff --git a/app/src/main/java/com/aurora/store/compose/ui/search/SearchScreen.kt b/app/src/main/java/com/aurora/store/compose/ui/search/SearchScreen.kt
+index ade8e58..aa03819 100644
+--- a/app/src/main/java/com/aurora/store/compose/ui/search/SearchScreen.kt
++++ b/app/src/main/java/com/aurora/store/compose/ui/search/SearchScreen.kt
+@@ -104,7 +104,7 @@ fun SearchScreen(
+         onSearch = onSearchCallback,
+         onFetchSuggestions = onFetchSuggestionsCallback,
+         onFilter = { filter -> viewModel.filterResults(filter) },
+-        isAnonymous = viewModel.authProvider.isAnonymous
++        isAnonymous = viewModel.authProvider.isAnonymous,
+         onNavigateTo = onNavigateTo
+     )
+ }
+@@ -116,8 +116,8 @@ private fun ScreenContent(
+     onFetchSuggestions: (String) -> Unit = {},
+     onSearch: (String) -> Unit = {},
+     onFilter: (filter: SearchFilter) -> Unit = {},
+-    isAnonymous: Boolean = true
+-    nNavigateTo: (Destination) -> Unit = {}
++    isAnonymous: Boolean = true,
++    onNavigateTo: (Destination) -> Unit = {}
+ ) {
+     val activity = LocalActivity.current as? ComponentActivity
+     val textFieldState = rememberTextFieldState()
+```
+
+---
+
 ## 📅 עדכון: 2026-09-10 14:03:01 UTC
 **הודעת קומיט:** Update SearchScreen.kt
 **קוד שינוי:** `334d851a010f13fc8e3c582876142f729c257b01`
