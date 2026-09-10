@@ -1,3 +1,32 @@
+## 📅 עדכון: 2026-09-10 13:42:29 UTC
+**הודעת קומיט:** Add AppRequest data class to Screen
+**קוד שינוי:** `ac5d521f0f6eb240677815bea3ce393209f285f5`
+
+### 📂 קבצים שהושפעו:
+M	app/src/main/java/com/aurora/store/compose/navigation/Screen.kt
+
+### 📝 פירוט השינויים (Diff):
+```diff
+diff --git a/app/src/main/java/com/aurora/store/compose/navigation/Screen.kt b/app/src/main/java/com/aurora/store/compose/navigation/Screen.kt
+index 7025155..e52dddc 100644
+--- a/app/src/main/java/com/aurora/store/compose/navigation/Screen.kt
++++ b/app/src/main/java/com/aurora/store/compose/navigation/Screen.kt
+@@ -37,7 +37,10 @@ sealed class Screen : NavKey, Parcelable {
+ 
+     @Serializable
+     data object Search : Screen()
+-
++    
++    @Serializable
++    data class AppRequest(val initialQuery: String = "") : Screen()
++    
+     @Serializable
+     data class PermissionRationale(val requiredPermissions: Set<PermissionType>) : Screen()
+ 
+```
+
+---
+
 ## 📅 עדכון: 2026-09-10 13:41:35 UTC
 **הודעת קומיט:** Update Destination.kt
 **קוד שינוי:** `91d6982c9b80ba48849917a67687b28b9b483adf`
