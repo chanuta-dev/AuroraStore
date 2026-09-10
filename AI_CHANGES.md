@@ -1,3 +1,53 @@
+## 📅 עדכון: 2026-09-10 16:07:31 UTC
+**הודעת קומיט:** Refactor comments and update image URL handling
+**קוד שינוי:** `ac2ff2a76bf5ac97c57519befb95fcebabed01cc`
+
+### 📂 קבצים שהושפעו:
+M	app/src/main/java/com/aurora/store/compose/ui/request/AppRequestScreen.kt
+
+### 📝 פירוט השינויים (Diff):
+```diff
+diff --git a/app/src/main/java/com/aurora/store/compose/ui/request/AppRequestScreen.kt b/app/src/main/java/com/aurora/store/compose/ui/request/AppRequestScreen.kt
+index 3639d4a..729c24a 100644
+--- a/app/src/main/java/com/aurora/store/compose/ui/request/AppRequestScreen.kt
++++ b/app/src/main/java/com/aurora/store/compose/ui/request/AppRequestScreen.kt
+@@ -315,7 +315,7 @@ private fun AppIconWithPixelation(
+             .background(MaterialTheme.colorScheme.primaryContainer),
+         contentAlignment = Alignment.Center
+     ) {
+-        // גיבוי תמיד: אות ראשונה יפה במידה והתמונה חסומה ברשת/בנטפרי
++        // גיבוי תמיד: אות ראשונה אם התמונה לא זמינה או חסומה
+         Text(
+             text = title.take(1).uppercase(),
+             fontWeight = FontWeight.Bold,
+@@ -324,12 +324,9 @@ private fun AppIconWithPixelation(
+         )
+ 
+         if (iconUrl.isNotBlank()) {
+-            // אם מפוקסל: נדגום מגוגל תמונה זעירה (s12) ונמתח אותה ללא החלקה לקבלת פסיפס פיקסלים מושלם
+-            val finalUrl = if (isPixelated && iconUrl.contains("=")) {
+-                iconUrl.substringBeforeLast("=") + "=s12"
+-            } else {
+-                iconUrl
+-            }
++            // חיתוך סיומת קודמת אם קיימת, והוספת =s8 לקבלת 8x8 פיקסלים בלבד!
++            val cleanUrl = if (iconUrl.contains("=")) iconUrl.substringBeforeLast("=") else iconUrl
++            val finalUrl = if (isPixelated) "$cleanUrl=s8" else "$cleanUrl=s128"
+ 
+             AsyncImage(
+                 modifier = Modifier.fillMaxSize(),
+@@ -339,6 +336,7 @@ private fun AppIconWithPixelation(
+                     .build(),
+                 contentDescription = null,
+                 contentScale = ContentScale.Crop,
++                // ביטול החלקה במתיחה - מייצר קוביות פיקסלים חדות וגדולות
+                 filterQuality = if (isPixelated) FilterQuality.None else FilterQuality.Medium
+             )
+         }
+```
+
+---
+
 ## 📅 עדכון: 2026-09-10 14:29:05 UTC
 **הודעת קומיט:** Update AppRequestScreen.kt
 **קוד שינוי:** `8b405d9e93fcaa2cc072e6bee16bba8a96a24f73`
