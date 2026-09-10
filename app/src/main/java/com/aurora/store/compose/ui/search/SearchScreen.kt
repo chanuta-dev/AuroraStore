@@ -104,7 +104,7 @@ fun SearchScreen(
         onSearch = onSearchCallback,
         onFetchSuggestions = onFetchSuggestionsCallback,
         onFilter = { filter -> viewModel.filterResults(filter) },
-        isAnonymous = viewModel.authProvider.isAnonymous
+        isAnonymous = viewModel.authProvider.isAnonymous,
         onNavigateTo = onNavigateTo
     )
 }
@@ -116,8 +116,8 @@ private fun ScreenContent(
     onFetchSuggestions: (String) -> Unit = {},
     onSearch: (String) -> Unit = {},
     onFilter: (filter: SearchFilter) -> Unit = {},
-    isAnonymous: Boolean = true
-    nNavigateTo: (Destination) -> Unit = {}
+    isAnonymous: Boolean = true,
+    onNavigateTo: (Destination) -> Unit = {}
 ) {
     val activity = LocalActivity.current as? ComponentActivity
     val textFieldState = rememberTextFieldState()
