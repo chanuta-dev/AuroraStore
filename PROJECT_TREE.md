@@ -628,6 +628,8 @@
 │   │   │   │           │   │   │   ├── InstallerViewModel.kt
 │   │   │   │           │   │   │   ├── ProxyURLViewModel.kt
 │   │   │   │           │   │   │   └── UpdatesRestrictionsViewModel.kt
+│   │   │   │           │   │   ├── request
+│   │   │   │           │   │   │   └── AppRequestViewModel.kt
 │   │   │   │           │   │   ├── search
 │   │   │   │           │   │   │   └── SearchViewModel.kt
 │   │   │   │           │   │   ├── sheets
@@ -1093,5 +1095,5 @@
 ├── summery_for_AI.md
 └── updates.json
 
-273 directories, 817 files
+274 directories, 818 files
 ```
