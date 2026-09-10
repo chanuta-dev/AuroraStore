@@ -1,3 +1,28 @@
+## 📅 עדכון: 2026-09-10 13:41:35 UTC
+**הודעת קומיט:** Update Destination.kt
+**קוד שינוי:** `91d6982c9b80ba48849917a67687b28b9b483adf`
+
+### 📂 קבצים שהושפעו:
+M	app/src/main/java/com/aurora/store/compose/navigation/Destination.kt
+
+### 📝 פירוט השינויים (Diff):
+```diff
+diff --git a/app/src/main/java/com/aurora/store/compose/navigation/Destination.kt b/app/src/main/java/com/aurora/store/compose/navigation/Destination.kt
+index e6948c7..19126de 100644
+--- a/app/src/main/java/com/aurora/store/compose/navigation/Destination.kt
++++ b/app/src/main/java/com/aurora/store/compose/navigation/Destination.kt
+@@ -23,6 +23,7 @@ sealed class Destination {
+     data class AppUpdate(val update: Update) : Destination()
+ 
+     data object Search : Destination()
++    data class AppRequest(val initialQuery: String = "") : Destination()
+     data object Downloads : Destination()
+ 
+     data class StreamBrowse(val cluster: StreamCluster) : Destination()
+```
+
+---
+
 ## 📅 עדכון: 2026-09-10 13:01:56 UTC
 **הודעת קומיט:** Add filterWhitelist parameter to search methods
 **קוד שינוי:** `e5a10ef18e59762c1c65bb3787642fe5c957c340`
