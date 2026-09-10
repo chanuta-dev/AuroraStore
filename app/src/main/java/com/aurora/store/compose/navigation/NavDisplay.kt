@@ -186,6 +186,9 @@ fun NavDisplay(startDestination: NavKey) {
             is Destination.AppUpdate -> Unit
             is Destination.StreamBrowse -> backstack.add(Screen.StreamBrowse(destination.cluster))
             is Destination.GoogleLogin -> backstack.add(Screen.GoogleLogin(destination.addAccount))
+            is Destination.AppRequest -> backstack.add(
+                Screen.AppRequest(destination.initialQuery)
+            )
 
             Destination.Search -> backstack.add(Screen.Search)
             Destination.Downloads -> backstack.add(Screen.Downloads)
@@ -304,7 +307,7 @@ fun NavDisplay(startDestination: NavKey) {
                             slideOutVertically(navSlideSpec) { it }
                     }
                 }
-            ) { SearchScreen() }
+            ) { SearchScreen(onNavigateTo = ::navigate) }
 
             entry<Screen.Splash> { screen ->
                 SplashScreen(
@@ -317,6 +320,13 @@ fun NavDisplay(startDestination: NavKey) {
                 GoogleLoginScreen(
                     addAccount = screen.addAccount,
                     onNavigateTo = ::navigate
+                )
+            }
+
+            entry<Screen.AppRequest> { screen ->
+                com.aurora.store.compose.ui.request.AppRequestScreen(
+                    initialQuery = screen.initialQuery,
+                    onNavigateBack = { backstack.removeLastOrNull() }
                 )
             }
 
