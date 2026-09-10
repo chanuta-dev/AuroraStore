@@ -1,3 +1,82 @@
+## 📅 עדכון: 2026-09-10 16:33:49 UTC
+**הודעת קומיט:** Implement RequestAppFooterCard in SearchScreen
+
+Added a footer card for app requests in the search results.
+**קוד שינוי:** `be25376f60d21f036009a7f779b0a1b687b613d0`
+
+### 📂 קבצים שהושפעו:
+M	app/src/main/java/com/aurora/store/compose/ui/search/SearchScreen.kt
+
+### 📝 פירוט השינויים (Diff):
+```diff
+diff --git a/app/src/main/java/com/aurora/store/compose/ui/search/SearchScreen.kt b/app/src/main/java/com/aurora/store/compose/ui/search/SearchScreen.kt
+index aa03819..e3da3eb 100644
+--- a/app/src/main/java/com/aurora/store/compose/ui/search/SearchScreen.kt
++++ b/app/src/main/java/com/aurora/store/compose/ui/search/SearchScreen.kt
+@@ -272,6 +272,18 @@ private fun ScreenContent(
+                                             )
+                                         }
+                                     }
++                                    // --- כרטיס בקשה בסוף תוצאות החיפוש ---
++                                    if (isSearching && results.itemCount > 0) {
++                                        item(key = "request_app_footer") {
++                                            RequestAppFooterCard(
++                                                onAction = {
++                                                    onNavigateTo(
++                                                        Destination.AppRequest(textFieldState.text.toString())
++                                                    )
++                                                }
++                                            )
++                                        }
++                                    }
+                                 }
+                                 ScrollHint(
+                                     listState = listState,
+@@ -459,3 +471,40 @@ private fun SearchScreenPreview(@PreviewParameter(AppPreviewProvider::class) app
+     val results = MutableStateFlow(PagingData.from(apps)).collectAsLazyPagingItems()
+     ScreenContent(results = results)
+ }
++@Composable
++private fun RequestAppFooterCard(onAction: () -> Unit) {
++    androidx.compose.material3.Card(
++        modifier = Modifier
++            .fillMaxWidth()
++            .padding(vertical = 12.dp)
++            .androidx.compose.foundation.clickable { onAction() },
++        colors = androidx.compose.material3.CardDefaults.cardColors(
++            containerColor = MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.5f)
++        ),
++        shape = androidx.compose.foundation.shape.RoundedCornerShape(12.dp)
++    ) {
++        Row(
++            modifier = Modifier
++                .fillMaxWidth()
++                .padding(16.dp),
++            verticalAlignment = Alignment.CenterVertically,
++            horizontalArrangement = Arrangement.SpaceBetween
++        ) {
++            Column(modifier = Modifier.weight(1f)) {
++                Text(
++                    text = "לא מצאת את מה שחיפשת?",
++                    fontWeight = androidx.compose.ui.text.font.FontWeight.Bold,
++                    style = MaterialTheme.typography.bodyMedium
++                )
++                Text(
++                    text = "חפש בכל החנות ובקש הוספה למערכת",
++                    style = MaterialTheme.typography.bodySmall,
++                    color = MaterialTheme.colorScheme.onSurfaceVariant
++                )
++            }
++            androidx.compose.material3.Button(onClick = onAction) {
++                Text("בקש")
++            }
++        }
++    }
++}
+```
+
+---
+
 ## 📅 עדכון: 2026-09-10 16:07:31 UTC
 **הודעת קומיט:** Refactor comments and update image URL handling
 **קוד שינוי:** `ac2ff2a76bf5ac97c57519befb95fcebabed01cc`
