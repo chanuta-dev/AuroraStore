@@ -1,3 +1,53 @@
+## 📅 עדכון: 2026-09-10 13:55:19 UTC
+**הודעת קומיט:** Add AppRequest screen navigation and update SearchScreen
+**קוד שינוי:** `95f584eac3eb32f5e27ffe96ec714c120a7066e9`
+
+### 📂 קבצים שהושפעו:
+M	app/src/main/java/com/aurora/store/compose/navigation/NavDisplay.kt
+
+### 📝 פירוט השינויים (Diff):
+```diff
+diff --git a/app/src/main/java/com/aurora/store/compose/navigation/NavDisplay.kt b/app/src/main/java/com/aurora/store/compose/navigation/NavDisplay.kt
+index 8aff138..5334324 100644
+--- a/app/src/main/java/com/aurora/store/compose/navigation/NavDisplay.kt
++++ b/app/src/main/java/com/aurora/store/compose/navigation/NavDisplay.kt
+@@ -186,6 +186,9 @@ fun NavDisplay(startDestination: NavKey) {
+             is Destination.AppUpdate -> Unit
+             is Destination.StreamBrowse -> backstack.add(Screen.StreamBrowse(destination.cluster))
+             is Destination.GoogleLogin -> backstack.add(Screen.GoogleLogin(destination.addAccount))
++            is Destination.AppRequest -> backstack.add(
++                Screen.AppRequest(destination.initialQuery)
++            )
+ 
+             Destination.Search -> backstack.add(Screen.Search)
+             Destination.Downloads -> backstack.add(Screen.Downloads)
+@@ -304,7 +307,7 @@ fun NavDisplay(startDestination: NavKey) {
+                             slideOutVertically(navSlideSpec) { it }
+                     }
+                 }
+-            ) { SearchScreen() }
++            ) { SearchScreen(onNavigateTo = ::navigate) }
+ 
+             entry<Screen.Splash> { screen ->
+                 SplashScreen(
+@@ -320,6 +323,13 @@ fun NavDisplay(startDestination: NavKey) {
+                 )
+             }
+ 
++            entry<Screen.AppRequest> { screen ->
++                com.aurora.store.compose.ui.request.AppRequestScreen(
++                    initialQuery = screen.initialQuery,
++                    onNavigateBack = { backstack.removeLastOrNull() }
++                )
++            }
++
+             entry<Screen.Onboarding> { OnboardingScreen() }
+             entry<Screen.Blacklist> { BlacklistScreen() }
+             entry<Screen.Downloads> { DownloadsScreen(onNavigateTo = ::navigate) }
+```
+
+---
+
 ## 📅 עדכון: 2026-09-10 13:49:23 UTC
 **הודעת קומיט:** Create AppRequestScreen.kt
 **קוד שינוי:** `ff31bdb20742c1a10921ff3a27a8840631eba204`
