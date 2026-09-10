@@ -1,3 +1,63 @@
+## 📅 עדכון: 2026-09-10 14:03:01 UTC
+**הודעת קומיט:** Update SearchScreen.kt
+**קוד שינוי:** `334d851a010f13fc8e3c582876142f729c257b01`
+
+### 📂 קבצים שהושפעו:
+M	app/src/main/java/com/aurora/store/compose/ui/search/SearchScreen.kt
+
+### 📝 פירוט השינויים (Diff):
+```diff
+diff --git a/app/src/main/java/com/aurora/store/compose/ui/search/SearchScreen.kt b/app/src/main/java/com/aurora/store/compose/ui/search/SearchScreen.kt
+index d51d025..ade8e58 100644
+--- a/app/src/main/java/com/aurora/store/compose/ui/search/SearchScreen.kt
++++ b/app/src/main/java/com/aurora/store/compose/ui/search/SearchScreen.kt
+@@ -87,7 +87,10 @@ import kotlinx.coroutines.flow.collectLatest
+ import kotlinx.coroutines.launch
+ 
+ @Composable
+-fun SearchScreen(viewModel: SearchViewModel = hiltViewModel()) {
++fun SearchScreen(
++    viewModel: SearchViewModel = hiltViewModel(),
++    onNavigateTo: (Destination) -> Unit = {}
++) {
+     val suggestions by viewModel.suggestions.collectAsStateWithLifecycle()
+     val results = viewModel.apps.collectAsLazyPagingItems()
+ 
+@@ -102,6 +105,7 @@ fun SearchScreen(viewModel: SearchViewModel = hiltViewModel()) {
+         onFetchSuggestions = onFetchSuggestionsCallback,
+         onFilter = { filter -> viewModel.filterResults(filter) },
+         isAnonymous = viewModel.authProvider.isAnonymous
++        onNavigateTo = onNavigateTo
+     )
+ }
+ 
+@@ -113,6 +117,7 @@ private fun ScreenContent(
+     onSearch: (String) -> Unit = {},
+     onFilter: (filter: SearchFilter) -> Unit = {},
+     isAnonymous: Boolean = true
++    nNavigateTo: (Destination) -> Unit = {}
+ ) {
+     val activity = LocalActivity.current as? ComponentActivity
+     val textFieldState = rememberTextFieldState()
+@@ -238,7 +243,13 @@ private fun ScreenContent(
+                             Placeholder(
+                                 modifier = Modifier.padding(paddingValues),
+                                 painter = painterResource(R.drawable.ic_disclaimer),
+-                                message = stringResource(R.string.no_apps_available)
++                                message = stringResource(R.string.no_apps_available),
++                                actionLabel = "בקש הוספת אפליקציה לחנות",
++                                onAction = {
++                                    onNavigateTo(
++                                        Destination.AppRequest(textFieldState.text.toString())
++                                    )
++                                }
+                             )
+                         } else {
+                             val listState = rememberLazyListState()
+```
+
+---
+
 ## 📅 עדכון: 2026-09-10 13:55:19 UTC
 **הודעת קומיט:** Add AppRequest screen navigation and update SearchScreen
 **קוד שינוי:** `95f584eac3eb32f5e27ffe96ec714c120a7066e9`
