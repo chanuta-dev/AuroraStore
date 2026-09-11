@@ -43,11 +43,13 @@ import com.aurora.store.data.model.NetworkStatus
 import com.aurora.store.data.providers.NetworkProvider
 import com.aurora.store.data.receiver.MigrationReceiver
 import com.aurora.store.util.AppLockAuthenticator
-import com.aurora.store.util.AppSelfUpdater
 import com.aurora.store.util.PackageUtil
 import com.aurora.store.util.Preferences
 import dagger.hilt.android.AndroidEntryPoint
 import javax.inject.Inject
+import androidx.lifecycle.lifecycleScope
+import com.aurora.store.data.helper.DownloadHelper
+import kotlinx.coroutines.launch
 
 @AndroidEntryPoint
 class ComposeActivity : FragmentActivity() {
@@ -55,6 +57,8 @@ class ComposeActivity : FragmentActivity() {
     @Inject lateinit var networkProvider: NetworkProvider
 
     @Inject lateinit var appLockManager: AppLockManager
+
+    @Inject lateinit var downloadHelper: DownloadHelper
 
     override fun onCreate(savedInstanceState: Bundle?) {
         MigrationReceiver.runMigrationsIfRequired(this)
@@ -113,7 +117,9 @@ class ComposeActivity : FragmentActivity() {
                         releaseInfo = release,
                         onUpdate = {
                             availableUpdate = null
-                            AppSelfUpdater.downloadAndInstall(this@ComposeActivity, release)
+                            lifecycleScope.launch {
+                                downloadHelper.enqueueSelfUpdate(release)
+                            }
                         },
                         onDismiss = {
                             availableUpdate = null
