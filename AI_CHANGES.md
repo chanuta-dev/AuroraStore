@@ -1,3 +1,53 @@
+## 📅 עדכון: 2026-09-11 07:37:55 UTC
+**הודעת קומיט:** Add size property to SelfUpdateManager data class
+**קוד שינוי:** `35e151fe7b375996f99905f5ea86401b6d0f5619`
+
+### 📂 קבצים שהושפעו:
+M	GooglePlayAPI/lib/src/main/java/com/aurora/gplayapi/SelfUpdateManager.kt
+
+### 📝 פירוט השינויים (Diff):
+```diff
+diff --git a/GooglePlayAPI/lib/src/main/java/com/aurora/gplayapi/SelfUpdateManager.kt b/GooglePlayAPI/lib/src/main/java/com/aurora/gplayapi/SelfUpdateManager.kt
+index 989b885..046aef5 100644
+--- a/GooglePlayAPI/lib/src/main/java/com/aurora/gplayapi/SelfUpdateManager.kt
++++ b/GooglePlayAPI/lib/src/main/java/com/aurora/gplayapi/SelfUpdateManager.kt
+@@ -18,6 +18,7 @@ data class ReleaseInfo(
+     val downloadUrl: String,
+     val releaseNotes: String,
+     val fileName: String,
++    val size: Long = 0L,
+     val isPrerelease: Boolean = false
+ )
+ 
+@@ -105,13 +106,15 @@ object SelfUpdateManager {
+         val assets = json.optJSONArray("assets") ?: return null
+         var apkUrl: String? = null
+         var apkName: String? = null
+-
++        var apkSize: Long = 0L
++        
+         for (i in 0 until assets.length()) {
+             val asset = assets.getJSONObject(i)
+             val name = asset.optString("name", "")
+             if (name.endsWith(".apk", ignoreCase = true)) {
+                 apkUrl = asset.optString("browser_download_url", "")
+                 apkName = name
++                apkSize = asset.optLong("size", 0L)
+                 break
+             }
+         }
+@@ -122,6 +125,7 @@ object SelfUpdateManager {
+                 downloadUrl = apkUrl,
+                 releaseNotes = releaseNotes,
+                 fileName = apkName ?: "AuroraStore-$latestVersionName.apk",
++                size = apkSize,
+                 isPrerelease = isPrerelease
+             )
+         }
+```
+
+---
+
 ## 📅 עדכון: 2026-09-10 16:44:16 UTC
 **הודעת קומיט:** Refactor RequestAppFooterCard to use simplified imports
 **קוד שינוי:** `725148baa221690cf406b89bc2f31081807eedd8`
