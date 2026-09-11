@@ -1,3 +1,38 @@
+## 📅 עדכון: 2026-09-11 09:25:00 UTC
+**הודעת קומיט:** Update README with management dashboard information
+
+Added management dashboard and backend integration details.
+**קוד שינוי:** `b4a0b2834efb7b50f64668d686814ba1c2c0b5b2`
+
+### 📂 קבצים שהושפעו:
+M	README.md
+
+### 📝 פירוט השינויים (Diff):
+```diff
+diff --git a/README.md b/README.md
+index cb46578..cb23f81 100644
+--- a/README.md
++++ b/README.md
+@@ -49,7 +49,14 @@
+ - `UPDATE_PACKAGES_WITHOUT_USER_ACTION` / `ENFORCE_UPDATE_OWNERSHIP`: עדכון אוטומטי ושקט (במכשירים נתמכים).
+ 
+ ---
+-
++### 🎛️ דשבורד הניהול וה-Backend
++הרשימה הלבנה, קטלוג ה-AI ובקשות האפליקציות של המשתמשים מנוהלים בריפו ייעודי:
++* **מאגר הדשבורד:** [chanuta159-design/aurora-whitelist](https://github.com/chanuta159-design/aurora-whitelist)
++* **דשבורד חי ב-Vercel:** [aurora-whitelist-chi.vercel.app](https://aurora-whitelist-chi.vercel.app)
++
++**אינטגרציה מול האפליקציה:**
++* `WhitelistManager.kt` מושך את הרשימה המאושרת מתוך `categorized-whitelist.json`.
++* `AppRequestScreen.kt` שולח בקשות משתמש ישירות ל-API בכתובת `/api/request-app`.
+ ## 📄 רישיון וקרדיטים
+ 
+ פרויקט זה מבוסס על [Aurora Store](https://gitlab.com/AuroraOSS/AuroraStore) ומשוחרר תחת רישיון **GNU General Public License v3.0 (GPLv3)**.
+```
+
+---
+
 ## 📅 עדכון: 2026-09-11 08:52:00 UTC
 **הודעת קומיט:** Update summery_for_AI.md
 **קוד שינוי:** `5513e0c998f6fc7c522311a24a0d45bb2118bb0b`
