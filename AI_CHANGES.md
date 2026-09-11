@@ -1,3 +1,60 @@
+## 📅 עדכון: 2026-09-11 07:39:43 UTC
+**הודעת קומיט:** Update DownloadHelper.kt
+**קוד שינוי:** `525461b1218b948b905853915d35548f73d0d44c`
+
+### 📂 קבצים שהושפעו:
+M	app/src/main/java/com/aurora/store/data/helper/DownloadHelper.kt
+
+### 📝 פירוט השינויים (Diff):
+```diff
+diff --git a/app/src/main/java/com/aurora/store/data/helper/DownloadHelper.kt b/app/src/main/java/com/aurora/store/data/helper/DownloadHelper.kt
+index 2d65a31..32c8480 100644
+--- a/app/src/main/java/com/aurora/store/data/helper/DownloadHelper.kt
++++ b/app/src/main/java/com/aurora/store/data/helper/DownloadHelper.kt
+@@ -193,7 +193,38 @@ class DownloadHelper @Inject constructor(
+     suspend fun enqueueStandalone(externalApk: ExternalApk) {
+         enqueue(Download.fromExternalApk(externalApk))
+     }
+-
++    
++    /**
++     * Enqueues Aurora Store self-update for download & install via the store's regular pipeline.
++     */
++    suspend fun enqueueSelfUpdate(releaseInfo: com.aurora.gplayapi.ReleaseInfo) {
++        val playFile = com.aurora.gplayapi.data.models.PlayFile(
++            name = releaseInfo.fileName.ifBlank { "base.apk" },
++            url = releaseInfo.downloadUrl,
++            size = releaseInfo.size,
++            type = com.aurora.gplayapi.data.models.PlayFile.Type.BASE
++        )
++        val download = Download(
++            packageName = context.packageName,
++            versionCode = com.aurora.store.BuildConfig.VERSION_CODE.toLong() + 1,
++            offerType = 0,
++            isInstalled = true,
++            displayName = context.getString(com.aurora.store.R.string.app_name),
++            iconURL = "",
++            size = releaseInfo.size,
++            id = context.packageName.hashCode(),
++            status = DownloadStatus.QUEUED,
++            progress = 0,
++            speed = 0L,
++            timeRemaining = 0L,
++            totalFiles = 1,
++            downloadedFiles = 0,
++            fileList = listOf(playFile),
++            sharedLibs = emptyList()
++        )
++        enqueue(download)
++    }
++    
+     /**
+      * Inserts a new download row, but only when a (re)download is actually needed. For an
+      * existing record of the same version this:
+```
+
+---
+
 ## 📅 עדכון: 2026-09-11 07:37:55 UTC
 **הודעת קומיט:** Add size property to SelfUpdateManager data class
 **קוד שינוי:** `35e151fe7b375996f99905f5ea86401b6d0f5619`
