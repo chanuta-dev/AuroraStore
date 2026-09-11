@@ -18,6 +18,7 @@ data class ReleaseInfo(
     val downloadUrl: String,
     val releaseNotes: String,
     val fileName: String,
+    val size: Long = 0L,
     val isPrerelease: Boolean = false
 )
 
@@ -105,13 +106,15 @@ object SelfUpdateManager {
         val assets = json.optJSONArray("assets") ?: return null
         var apkUrl: String? = null
         var apkName: String? = null
-
+        var apkSize: Long = 0L
+        
         for (i in 0 until assets.length()) {
             val asset = assets.getJSONObject(i)
             val name = asset.optString("name", "")
             if (name.endsWith(".apk", ignoreCase = true)) {
                 apkUrl = asset.optString("browser_download_url", "")
                 apkName = name
+                apkSize = asset.optLong("size", 0L)
                 break
             }
         }
@@ -122,6 +125,7 @@ object SelfUpdateManager {
                 downloadUrl = apkUrl,
                 releaseNotes = releaseNotes,
                 fileName = apkName ?: "AuroraStore-$latestVersionName.apk",
+                size = apkSize,
                 isPrerelease = isPrerelease
             )
         }
