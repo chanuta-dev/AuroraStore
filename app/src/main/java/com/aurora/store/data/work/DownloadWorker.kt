@@ -135,7 +135,9 @@ class DownloadWorker @AssistedInject constructor(
         // Fetch required data for download
         try {
             download = downloadDao.getDownload(inputData.getString(DownloadHelper.PACKAGE_NAME)!!)
-            purchaseHelper = resolvePurchaseHelper(download.packageName)
+            if (download.packageName != context.packageName) {
+                purchaseHelper = resolvePurchaseHelper(download.packageName)
+            }
         } catch (exception: Exception) {
             return onFailure(exception)
         }
@@ -159,13 +161,16 @@ class DownloadWorker @AssistedInject constructor(
         // Try to purchase the app if file list is empty. Surface any GPlayApi error
         // (e.g. AppNotPurchased, AppNotSupported, AppRemoved) as the failure cause so
         // the user sees the real reason instead of a generic "files not available".
-        notifyStatus(DownloadStatus.PURCHASING)
-        try {
-            download.fileList = download.fileList.ifEmpty {
-                purchase(download.packageName, download.versionCode, download.offerType)
+        // רק לאפליקציות רגילות פונים לגוגל פליי, לא לעדכון של החנות עצמה
+        if (download.packageName != context.packageName) {
+            notifyStatus(DownloadStatus.PURCHASING)
+            try {
+                download.fileList = download.fileList.ifEmpty {
+                    purchase(download.packageName, download.versionCode, download.offerType)
+                }
+            } catch (exception: Exception) {
+                return onFailure(exception)
             }
-        } catch (exception: Exception) {
-            return onFailure(exception)
         }
 
         // Bail out if file list is empty after purchase
@@ -648,10 +653,9 @@ class DownloadWorker @AssistedInject constructor(
         val file = PathUtil.getLocalFile(context, gFile, download)
         Log.i(TAG, "Verifying $file")
 
-        if (com.aurora.gplayapi.PatchedAppManager.isPatchedApp(download.packageName)) {
+        if (download.packageName == context.packageName || com.aurora.gplayapi.PatchedAppManager.isPatchedApp(download.packageName)) {
             return file.exists() && file.length() > 0
         }
-
         val algorithm = if (gFile.sha256.isBlank()) Algorithm.SHA1 else Algorithm.SHA256
         val expectedSha = if (algorithm == Algorithm.SHA1) gFile.sha1 else gFile.sha256
 
