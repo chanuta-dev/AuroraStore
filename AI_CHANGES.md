@@ -1,3 +1,106 @@
+## 📅 עדכון: 2026-09-11 07:48:06 UTC
+**הודעת קומיט:** Delete app/src/main/java/com/aurora/store/util/AppSelfUpdater.kt
+**קוד שינוי:** `16f841fe3b7d6e1f4ae10e9fad93b1c2dff3c9c2`
+
+### 📂 קבצים שהושפעו:
+D	app/src/main/java/com/aurora/store/util/AppSelfUpdater.kt
+
+### 📝 פירוט השינויים (Diff):
+```diff
+diff --git a/app/src/main/java/com/aurora/store/util/AppSelfUpdater.kt b/app/src/main/java/com/aurora/store/util/AppSelfUpdater.kt
+deleted file mode 100644
+index df9c1ec..0000000
+--- a/app/src/main/java/com/aurora/store/util/AppSelfUpdater.kt
++++ /dev/null
+@@ -1,84 +0,0 @@
+-/*
+- * SPDX-FileCopyrightText: 2026 Aurora OSS
+- * SPDX-License-Identifier: GPL-3.0-or-later
+- */
+-
+-package com.aurora.store.util
+-
+-import android.app.DownloadManager
+-import android.content.BroadcastReceiver
+-import android.content.Context
+-import android.content.Intent
+-import android.content.IntentFilter
+-import android.net.Uri
+-import android.os.Build
+-import android.os.Environment
+-import androidx.core.content.FileProvider
+-import com.aurora.gplayapi.ReleaseInfo
+-import java.io.File
+-
+-object AppSelfUpdater {
+-    fun downloadAndInstall(context: Context, releaseInfo: ReleaseInfo) {
+-        val destinationFile = File(
+-            context.getExternalFilesDir(Environment.DIRECTORY_DOWNLOADS),
+-            releaseInfo.fileName
+-        )
+-
+-        if (destinationFile.exists()) {
+-            destinationFile.delete()
+-        }
+-
+-        val request = DownloadManager.Request(Uri.parse(releaseInfo.downloadUrl))
+-            .setTitle("מוריד עדכון גרסה v${releaseInfo.versionName}")
+-            .setDescription(releaseInfo.fileName)
+-            .setNotificationVisibility(DownloadManager.Request.VISIBILITY_VISIBLE_NOTIFY_COMPLETED)
+-            .setDestinationUri(Uri.fromFile(destinationFile))
+-            .setAllowedOverMetered(true)
+-            .setAllowedOverRoaming(true)
+-
+-        val downloadManager = context.getSystemService(Context.DOWNLOAD_SERVICE) as DownloadManager
+-        val downloadId = downloadManager.enqueue(request)
+-
+-        val onComplete = object : BroadcastReceiver() {
+-            override fun onReceive(ctxt: Context, intent: Intent) {
+-                val id = intent.getLongExtra(DownloadManager.EXTRA_DOWNLOAD_ID, -1)
+-                if (id == downloadId) {
+-                    ctxt.unregisterReceiver(this)
+-                    installApk(ctxt, destinationFile)
+-                }
+-            }
+-        }
+-
+-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+-            context.registerReceiver(
+-                onComplete,
+-                IntentFilter(DownloadManager.ACTION_DOWNLOAD_COMPLETE),
+-                Context.RECEIVER_EXPORTED
+-            )
+-        } else {
+-            context.registerReceiver(
+-                onComplete,
+-                IntentFilter(DownloadManager.ACTION_DOWNLOAD_COMPLETE)
+-            )
+-        }
+-    }
+-
+-    private fun installApk(context: Context, apkFile: File) {
+-        if (!apkFile.exists()) return
+-
+-        val intent = Intent(Intent.ACTION_VIEW)
+-        val apkUri: Uri = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
+-            FileProvider.getUriForFile(
+-                context,
+-                "${context.packageName}.selfupdate.fileprovider",
+-                apkFile
+-            )
+-        } else {
+-            Uri.fromFile(apkFile)
+-        }
+-
+-        intent.setDataAndType(apkUri, "application/vnd.android.package-archive")
+-        intent.flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_GRANT_READ_URI_PERMISSION
+-        context.startActivity(intent)
+-    }
+-}
+```
+
+---
+
 ## 📅 עדכון: 2026-09-11 07:44:57 UTC
 **הודעת קומיט:** Update DownloadWorker.kt
 **קוד שינוי:** `a386beeab632ebcb942d0651e0f7c4aa82173362`

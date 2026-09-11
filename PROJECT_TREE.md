@@ -577,7 +577,6 @@
 │   │   │   │           │   │   ├── AC2DMTask.kt
 │   │   │   │           │   │   ├── AC2DMUtil.java
 │   │   │   │           │   │   ├── AppLockAuthenticator.kt
-│   │   │   │           │   │   ├── AppSelfUpdater.kt
 │   │   │   │           │   │   ├── CertUtil.kt
 │   │   │   │           │   │   ├── CommonUtil.kt
 │   │   │   │           │   │   ├── IFlavouredUtil.kt
@@ -1097,5 +1096,5 @@
 ├── summery_for_AI.md
 └── updates.json
 
-275 directories, 819 files
+275 directories, 818 files
 ```
