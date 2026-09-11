@@ -193,7 +193,38 @@ class DownloadHelper @Inject constructor(
     suspend fun enqueueStandalone(externalApk: ExternalApk) {
         enqueue(Download.fromExternalApk(externalApk))
     }
-
+    
+    /**
+     * Enqueues Aurora Store self-update for download & install via the store's regular pipeline.
+     */
+    suspend fun enqueueSelfUpdate(releaseInfo: com.aurora.gplayapi.ReleaseInfo) {
+        val playFile = com.aurora.gplayapi.data.models.PlayFile(
+            name = releaseInfo.fileName.ifBlank { "base.apk" },
+            url = releaseInfo.downloadUrl,
+            size = releaseInfo.size,
+            type = com.aurora.gplayapi.data.models.PlayFile.Type.BASE
+        )
+        val download = Download(
+            packageName = context.packageName,
+            versionCode = com.aurora.store.BuildConfig.VERSION_CODE.toLong() + 1,
+            offerType = 0,
+            isInstalled = true,
+            displayName = context.getString(com.aurora.store.R.string.app_name),
+            iconURL = "",
+            size = releaseInfo.size,
+            id = context.packageName.hashCode(),
+            status = DownloadStatus.QUEUED,
+            progress = 0,
+            speed = 0L,
+            timeRemaining = 0L,
+            totalFiles = 1,
+            downloadedFiles = 0,
+            fileList = listOf(playFile),
+            sharedLibs = emptyList()
+        )
+        enqueue(download)
+    }
+    
     /**
      * Inserts a new download row, but only when a (re)download is actually needed. For an
      * existing record of the same version this:
