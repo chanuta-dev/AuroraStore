@@ -49,7 +49,14 @@
 - `UPDATE_PACKAGES_WITHOUT_USER_ACTION` / `ENFORCE_UPDATE_OWNERSHIP`: עדכון אוטומטי ושקט (במכשירים נתמכים).
 
 ---
+### 🎛️ דשבורד הניהול וה-Backend
+הרשימה הלבנה, קטלוג ה-AI ובקשות האפליקציות של המשתמשים מנוהלים בריפו ייעודי:
+* **מאגר הדשבורד:** [chanuta159-design/aurora-whitelist](https://github.com/chanuta159-design/aurora-whitelist)
+* **דשבורד חי ב-Vercel:** [aurora-whitelist-chi.vercel.app](https://aurora-whitelist-chi.vercel.app)
 
+**אינטגרציה מול האפליקציה:**
+* `WhitelistManager.kt` מושך את הרשימה המאושרת מתוך `categorized-whitelist.json`.
+* `AppRequestScreen.kt` שולח בקשות משתמש ישירות ל-API בכתובת `/api/request-app`.
 ## 📄 רישיון וקרדיטים
 
 פרויקט זה מבוסס על [Aurora Store](https://gitlab.com/AuroraOSS/AuroraStore) ומשוחרר תחת רישיון **GNU General Public License v3.0 (GPLv3)**.
