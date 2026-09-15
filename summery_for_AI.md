@@ -123,6 +123,13 @@ The primary purpose of this fork is to operate as a **curated, filtered, and hyb
 
 ---
 
+## 📝 TODO List / Future Improvements
+- [ ] **Root Detection & Installer Recommendation Prompt**:
+  - Upon detecting Root access on the device during first launch or configuration, show a prompt/dialog querying the user if they would like to switch the default installer mode to Root for silent background updates.
+  - Provide a recommendation and guide for installing/configuring **Shizuku** as an efficient alternative installer mode if Root is unavailable or not configured.
+
+---
+
 ## 📈 Recent Modifications & Changelog
 - **App Request System**: Built `AppRequestScreen`, `AppRequestViewModel`, and Vercel API bridge with NetFree icon pixelation.
 - **Search UI Integration**: Added empty-state CTA and `RequestAppFooterCard` in `SearchScreen`.
