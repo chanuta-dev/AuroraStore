@@ -1,7 +1,7 @@
 # Aurora Store Fork — Custom Whitelist & Patched APK Routing Architecture
 
 ## 📌 Overview & Project Purpose
-This repository is a customized fork of **Aurora Store** (an open-source Android client for Google Play) and its underlying communication library **`gplayapi`**.
+This repository is a customized fork of **Aurora Store** (an open-source Android client for Google Play) and its me communication library **`gplayapi`**.
 
 The primary purpose of this fork is to operate as a **curated, filtered, and hybrid app store** tailored for content-filtered environments (such as NetFree) and kosher/custom Android ROMs (e.g., DumberOS).
 
@@ -13,6 +13,14 @@ The primary purpose of this fork is to operate as a **curated, filtered, and hyb
 5. **Resilient Offline/Online Caching**: Seamlessly handle startup without network connectivity and eliminate flicker/re-fetch loops on tab navigation.
 6. **Unified Native App Self-Update (Root & Shizuku)**: Checks GitHub Releases (`chanuta-dev/AuroraStore`) on launch and routes self-updates directly through Aurora's native `DownloadHelper` and `AppInstaller` pipeline, allowing completely silent background updates via Root or Shizuku without external helpers.
 7. **End-to-End User App Request System**: Allows users to search the unfiltered catalog to request unapproved apps directly from the client (with NetFree-style pixelated icons for unapproved apps) and manage/approve pending requests via a Vercel dashboard.
+
+---
+
+## 📋 TODO & Future Features
+- [ ] **Root Detection & Installer Recommendation Prompt**:
+  - Detect Root access on device launch/setup.
+  - Prompt the user with a prompt/dialog offering to switch the default app installer mode to **Root**.
+  - Recommend configuring/installing **Shizuku** on top of/alongside Root for seamless, stable background installations.
 
 ---
 
