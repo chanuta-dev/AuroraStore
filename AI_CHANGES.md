@@ -1,3 +1,46 @@
+## 📅 עדכון: 2026-09-15 10:24:11 UTC
+**הודעת קומיט:** Merge pull request #24 from chanuta-dev/fix-todo-shizuku-root-docs
+
+🤖 AI Update: docs: clarify TODO regarding Root detection and Shizuku recommendation
+**קוד שינוי:** `0e80088d26108fb9146abe7af7614cd80d1cea81`
+
+### 📂 קבצים שהושפעו:
+M	summery_for_AI.md
+
+### 📝 פירוט השינויים (Diff):
+```diff
+diff --git a/summery_for_AI.md b/summery_for_AI.md
+index 62fb221..9e2da33 100644
+--- a/summery_for_AI.md
++++ b/summery_for_AI.md
+@@ -1,7 +1,7 @@
+ # Aurora Store Fork — Custom Whitelist & Patched APK Routing Architecture
+ 
+ ## 📌 Overview & Project Purpose
+-This repository is a customized fork of **Aurora Store** (an open-source Android client for Google Play) and its underlying communication library **`gplayapi`**.
++This repository is a customized fork of **Aurora Store** (an open-source Android client for Google Play) and its me communication library **`gplayapi`**.
+ 
+ The primary purpose of this fork is to operate as a **curated, filtered, and hybrid app store** tailored for content-filtered environments (such as NetFree) and kosher/custom Android ROMs (e.g., DumberOS).
+ 
+@@ -16,6 +16,14 @@ The primary purpose of this fork is to operate as a **curated, filtered, and hyb
+ 
+ ---
+ 
++## 📋 TODO & Future Features
++- [ ] **Root Detection & Installer Recommendation Prompt**:
++  - Detect Root access on device launch/setup.
++  - Prompt the user with a prompt/dialog offering to switch the default app installer mode to **Root**.
++  - Recommend configuring/installing **Shizuku** on top of/alongside Root for seamless, stable background installations.
++
++---
++
+ ## 🏗 Ecosystem Architecture (3 Interconnected Components)
+ 
+ 1. **Aurora Store Client (This Repo)**: The Android app (Kotlin / Jetpack Compose) and `gplayapi` library.
+```
+
+---
+
 ## 📅 עדכון: 2026-09-11 09:25:00 UTC
 **הודעת קומיט:** Update README with management dashboard information
 
