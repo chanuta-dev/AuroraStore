@@ -1,3 +1,242 @@
+## 📅 עדכון: 2026-09-20 08:48:50 UTC
+**הודעת קומיט:** Refactor PatchedAppManager for dynamic app sources
+
+Updated PatchedAppManager to support dynamic app sources and CFOPUSER releases. Refactored methods for fetching and parsing app metadata and releases.
+**קוד שינוי:** `a1d22742a5b0aceb932809490453a0d5ff9e92eb`
+
+### 📂 קבצים שהושפעו:
+M	GooglePlayAPI/lib/src/main/java/com/aurora/gplayapi/PatchedAppManager.kt
+
+### 📝 פירוט השינויים (Diff):
+```diff
+diff --git a/GooglePlayAPI/lib/src/main/java/com/aurora/gplayapi/PatchedAppManager.kt b/GooglePlayAPI/lib/src/main/java/com/aurora/gplayapi/PatchedAppManager.kt
+index 0824e96..73c75a7 100644
+--- a/GooglePlayAPI/lib/src/main/java/com/aurora/gplayapi/PatchedAppManager.kt
++++ b/GooglePlayAPI/lib/src/main/java/com/aurora/gplayapi/PatchedAppManager.kt
+@@ -4,6 +4,7 @@ import com.aurora.gplayapi.data.models.App
+ import com.aurora.gplayapi.data.models.Artwork
+ import com.aurora.gplayapi.data.models.PlayFile
+ import org.json.JSONArray
++import org.json.JSONObject
+ import java.util.concurrent.ConcurrentHashMap
+ import kotlinx.coroutines.Dispatchers
+ import kotlinx.coroutines.withContext
+@@ -18,17 +19,18 @@ data class PatchedRelease(
+ )
+ 
+ object PatchedAppManager {
+-    private const val RELEASES_URL = "https://raw.githubusercontent.com/cfopuser/app-store/main/releases.json"
+-
+-    val selectedPatchedApps: Map<String, String> = mapOf(
+-        "com.whatsapp" to "whatsapp",
+-        "com.spotify.music" to "spotify",
+-        "com.bnhp.payments.paymentsapp" to "bit",
+-        "com.metrolist.music" to "metrolist"
+-    )
++    private const val CFOPUSER_RELEASES_URL = "https://raw.githubusercontent.com/cfopuser/app-store/main/releases.json"
++    private const val APP_SOURCES_URL = "https://raw.githubusercontent.com/chanuta159-design/aurora-whitelist/refs/heads/main/app-sources.json"
++
++    // מפה דינמית: נטענת מרחוק מ-app-sources.json (אין יותר קידוד קשיח!)
++    val dynamicCfopApps = ConcurrentHashMap<String, String>()
++    val customApps = ConcurrentHashMap<String, JSONObject>()
++
+     val latestReleases = ConcurrentHashMap<String, PatchedRelease>()
++    private val appMetadataCache = ConcurrentHashMap<String, App>()
+ 
+-    fun isPatchedApp(packageName: String): Boolean = selectedPatchedApps.containsKey(packageName)
++    fun isPatchedApp(packageName: String): Boolean =
++        dynamicCfopApps.containsKey(packageName) || customApps.containsKey(packageName)
+ 
+     fun getPatchedRelease(packageName: String): PatchedRelease? = latestReleases[packageName]
+ 
+@@ -38,31 +40,67 @@ object PatchedAppManager {
+         return release.versionName.isNotBlank() && release.versionName != installedVersionName
+     }
+ 
+-    private val appMetadataCache = java.util.concurrent.ConcurrentHashMap<String, App>()
+-
+-    suspend fun getAppMetadata(packageName: String): App? = kotlinx.coroutines.withContext(kotlinx.coroutines.Dispatchers.IO) {
++    suspend fun getAppMetadata(packageName: String): App? = withContext(Dispatchers.IO) {
+         appMetadataCache[packageName]?.let { return@withContext it }
+ 
+-        val appId = selectedPatchedApps[packageName] ?: return@withContext null
++        // 1. אם זו אפליקציה עצמאית (CUSTOM) - הפרטים נמשכים ישירות מהמקור המאוחד
++        customApps[packageName]?.let { obj ->
++            val name = obj.optString("name").ifBlank { obj.optString("name_en", packageName) }
++            val desc = obj.optString("description", "")
++            val category = obj.optString("category", "כלים")
++            val iconUrl = obj.optString("iconUrl", "")
++            val downloadUrl = obj.optString("downloadUrl", "")
++            val size = obj.optLong("size", 0L)
++            val versionName = obj.optString("versionName", "1.0")
++            val repo = obj.optString("repo", "")
++            val developer = if (repo.contains("/")) repo.substringBefore("/") else "עצמאי"
++
++            val app = App(
++                packageName = packageName,
++                id = packageName.hashCode(),
++                displayName = name,
++                description = desc,
++                shortDescription = desc,
++                categoryName = category,
++                developerName = developer,
++                versionName = versionName,
++                iconArtwork = Artwork(url = iconUrl),
++                isFree = true,
++                inPlayStore = false,
++                fileList = if (downloadUrl.isNotBlank()) {
++                    listOf(
++                        PlayFile(
++                            name = "${packageName}.apk",
++                            url = downloadUrl,
++                            size = size,
++                            type = PlayFile.Type.BASE
++                        )
++                    )
++                } else emptyList()
++            )
++            appMetadataCache[packageName] = app
++            return@withContext app
++        }
++
++        // 2. אם זו אפליקציה מ-CFOPUSER - נמשוך מ-app.json של CFOPUSER
++        val appId = dynamicCfopApps[packageName] ?: return@withContext null
+         val release = getPatchedRelease(packageName)
+ 
+         try {
+-            val appJsonUrl = java.net.URL("https://raw.githubusercontent.com/cfopuser/app-store/main/apps/$appId/app.json")
++            val appJsonUrl = URL("https://raw.githubusercontent.com/cfopuser/app-store/main/apps/$appId/app.json")
+             val jsonString = appJsonUrl.readText()
+-            val root = org.json.JSONObject(jsonString)
++            val root = JSONObject(jsonString)
+ 
+             val metadata = root.optJSONObject("metadata") ?: root
+             val assets = root.optJSONObject("assets")
+             val maintenance = root.optJSONObject("maintenance")
+ 
+-            // משיכה דינמית לחלוטין של כל השדות ישירות מתוך ה-JSON של האפליקציה:
+             val name = metadata.optString("name_he").ifBlank { metadata.optString("name", "") }
+             val desc = metadata.optString("description_he").ifBlank { metadata.optString("description", "") }
+             val fullDesc = metadata.optString("full_description_he").ifBlank { metadata.optString("full_description", desc) }
+             val category = metadata.optString("category_he").ifBlank { metadata.optString("category", "") }
+             val developer = maintenance?.optString("maintainer", "") ?: ""
+ 
+-            // חילוץ האייקון בצורה דינמית
+             val rawIconUrl = assets?.optString("icon_url", "") ?: ""
+             val iconUrl = when {
+                 rawIconUrl.startsWith("http") -> rawIconUrl
+@@ -101,18 +139,70 @@ object PatchedAppManager {
+             null
+         }
+     }
++
+     suspend fun fetchReleases(): Boolean = withContext(Dispatchers.IO) {
++        // שלב א': טעינת רשימת המקורות המאוחדת מ-GitHub
++        try {
++            val sourcesJson = URL(APP_SOURCES_URL).readText()
++            parseAppSourcesJson(sourcesJson)
++        } catch (e: Exception) {
++            android.util.Log.e("PatchedAppManager", "Failed to fetch app-sources.json", e)
++        }
++
++        // שלב ב': טעינת שחרורי CFOPUSER עבור האפליקציות שסומנו כ-CFOPUSER
+         try {
+-            val releasesJson = URL(RELEASES_URL).readText()
+-            parseReleasesJson(releasesJson)
++            val releasesJson = URL(CFOPUSER_RELEASES_URL).readText()
++            parseCfopReleasesJson(releasesJson)
+             true
+         } catch (e: Exception) {
+-            android.util.Log.e("PatchedAppManager", "Failed to fetch releases.json", e)
++            android.util.Log.e("PatchedAppManager", "Failed to fetch cfopuser releases.json", e)
+             false
+         }
+     }
+ 
+-    private fun parseReleasesJson(jsonString: String) {
++    private fun parseAppSourcesJson(jsonString: String) {
++        try {
++            val jsonArray = JSONArray(jsonString)
++            dynamicCfopApps.clear()
++            customApps.clear()
++
++            for (i in 0 until jsonArray.length()) {
++                val obj = jsonArray.getJSONObject(i)
++                val pkg = obj.optString("packageName", "").trim()
++                if (pkg.isBlank()) continue
++
++                val source = obj.optString("source", "CFOPUSER").uppercase()
++
++                when (source) {
++                    "CFOPUSER" -> {
++                        val appId = obj.optString("appId", "")
++                        if (appId.isNotBlank()) {
++                            dynamicCfopApps[pkg] = appId
++                        }
++                    }
++                    "CUSTOM" -> {
++                        customApps[pkg] = obj
++                        val versionName = obj.optString("versionName", "1.0")
++                        val downloadUrl = obj.optString("downloadUrl", "")
++                        val size = obj.optLong("size", 0L)
++
++                        latestReleases[pkg] = PatchedRelease(
++                            appId = pkg,
++                            versionName = versionName,
++                            downloadUrl = downloadUrl,
++                            size = size,
++                            fileName = "${pkg}.apk"
++                        )
++                    }
++                }
++            }
++            android.util.Log.i("PatchedAppManager", "Loaded app sources: ${dynamicCfopApps.size} CFOPUSER, ${customApps.size} CUSTOM")
++        } catch (e: Exception) {
++            android.util.Log.e("PatchedAppManager", "Failed to parse app-sources.json", e)
++        }
++    }
++
++    private fun parseCfopReleasesJson(jsonString: String) {
+         try {
+             val jsonArray = JSONArray(jsonString)
+             val processedApps = mutableSetOf<String>()
+@@ -130,7 +220,7 @@ object PatchedAppManager {
+                     else -> continue
+                 }
+ 
+-                if (!selectedPatchedApps.containsValue(appId) || processedApps.contains(appId)) {
++                if (!dynamicCfopApps.containsValue(appId) || processedApps.contains(appId)) {
+                     continue
+                 }
+ 
+@@ -142,8 +232,7 @@ object PatchedAppManager {
+ 
+                     if (assetName.endsWith(".apk") && downloadUrl.isNotBlank()) {
+                         val versionName = tagName.substringAfter("-v").replace("^v".toRegex(), "")
+-
+-                        val packageName = selectedPatchedApps.entries.firstOrNull { it.value == appId }?.key
++                        val packageName = dynamicCfopApps.entries.firstOrNull { it.value == appId }?.key
+                         if (packageName != null) {
+                             latestReleases[packageName] = PatchedRelease(
+                                 appId = appId,
+@@ -158,9 +247,9 @@ object PatchedAppManager {
+                     }
+                 }
+             }
+-            android.util.Log.i("PatchedAppManager", "Loaded ${latestReleases.size} selected patched apps")
++            android.util.Log.i("PatchedAppManager", "Loaded ${latestReleases.size} active releases")
+         } catch (e: Exception) {
+-            android.util.Log.e("PatchedAppManager", "Failed to parse releases.json", e)
++            android.util.Log.e("PatchedAppManager", "Failed to parse cfopuser releases.json", e)
+         }
+     }
+-}
+\ No newline at end of file
++}
+```
+
+---
+
 ## 📅 עדכון: 2026-09-15 10:24:11 UTC
 **הודעת קומיט:** Merge pull request #24 from chanuta-dev/fix-todo-shizuku-root-docs
 
