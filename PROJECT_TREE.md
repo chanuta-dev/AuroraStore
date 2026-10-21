@@ -385,6 +385,7 @@
 │   │   │   │           │   │       ├── dev
 │   │   │   │           │   │       │   └── DevProfileScreen.kt
 │   │   │   │           │   │       ├── dialog
+│   │   │   │           │   │       │   ├── RootRecommendationDialog.kt
 │   │   │   │           │   │       │   └── UpdateAvailableDialog.kt
 │   │   │   │           │   │       ├── dispenser
 │   │   │   │           │   │       │   ├── DispenserScreen.kt
@@ -1096,5 +1097,5 @@
 ├── summery_for_AI.md
 └── updates.json
 
-275 directories, 818 files
+275 directories, 819 files
 ```
