@@ -1,3 +1,126 @@
+## 📅 עדכון: 2026-10-21 22:56:50 UTC
+**הודעת קומיט:** Add root access checks and update dialogs
+**קוד שינוי:** `761c6546c8fe28a68be72c32a698ae781a8c08b2`
+
+### 📂 קבצים שהושפעו:
+M	app/src/main/java/com/aurora/store/ComposeActivity.kt
+
+### 📝 פירוט השינויים (Diff):
+```diff
+diff --git a/app/src/main/java/com/aurora/store/ComposeActivity.kt b/app/src/main/java/com/aurora/store/ComposeActivity.kt
+index b008484..2f71a0e 100644
+--- a/app/src/main/java/com/aurora/store/ComposeActivity.kt
++++ b/app/src/main/java/com/aurora/store/ComposeActivity.kt
+@@ -26,6 +26,7 @@ import androidx.lifecycle.Lifecycle
+ import androidx.lifecycle.LifecycleEventObserver
+ import androidx.lifecycle.compose.LocalLifecycleOwner
+ import androidx.lifecycle.compose.collectAsStateWithLifecycle
++import androidx.lifecycle.lifecycleScope
+ import com.aurora.extensions.getPackageName
+ import com.aurora.gplayapi.ReleaseInfo
+ import com.aurora.gplayapi.SelfUpdateManager
+@@ -36,9 +37,13 @@ import com.aurora.store.compose.composition.UI
+ import com.aurora.store.compose.navigation.NavDisplay
+ import com.aurora.store.compose.navigation.Screen
+ import com.aurora.store.compose.theme.AuroraTheme
++import com.aurora.store.compose.ui.dialog.RootRecommendationDialog
+ import com.aurora.store.compose.ui.dialog.UpdateAvailableDialog
+ import com.aurora.store.compose.ui.lock.AppLockScreen
+ import com.aurora.store.data.AppLockManager
++import com.aurora.store.data.helper.DownloadHelper
++import com.aurora.store.data.installer.AppInstaller
++import com.aurora.store.data.model.Installer
+ import com.aurora.store.data.model.NetworkStatus
+ import com.aurora.store.data.providers.NetworkProvider
+ import com.aurora.store.data.receiver.MigrationReceiver
+@@ -47,9 +52,9 @@ import com.aurora.store.util.PackageUtil
+ import com.aurora.store.util.Preferences
+ import dagger.hilt.android.AndroidEntryPoint
+ import javax.inject.Inject
+-import androidx.lifecycle.lifecycleScope
+-import com.aurora.store.data.helper.DownloadHelper
++import kotlinx.coroutines.Dispatchers
+ import kotlinx.coroutines.launch
++import kotlinx.coroutines.withContext
+ 
+ @AndroidEntryPoint
+ class ComposeActivity : FragmentActivity() {
+@@ -102,6 +107,8 @@ class ComposeActivity : FragmentActivity() {
+                 }
+ 
+                 var availableUpdate by remember { mutableStateOf<ReleaseInfo?>(null) }
++                var showRootPrompt by remember { mutableStateOf(false) }
++                var isShizukuAvailable by remember { mutableStateOf(false) }
+ 
+                 LaunchedEffect(Unit) {
+                     val currentVersion = BuildConfig.VERSION_NAME
+@@ -110,6 +117,24 @@ class ComposeActivity : FragmentActivity() {
+                     if (release != null) {
+                         availableUpdate = release
+                     }
++
++                    // בדיקת זיהוי Root ברקע (על Dispatchers.IO כדי לא להקפיא את ה-UI)
++                    withContext(Dispatchers.IO) {
++                        val alreadyPrompted = Preferences.getBoolean(
++                            this@ComposeActivity,
++                            Preferences.PREFERENCE_ROOT_INSTALLER_PROMPTED,
++                            false
++                        )
++                        val currentInstaller = AppInstaller.getCurrentInstaller(this@ComposeActivity)
++
++                        // נשאל רק אם עדיין לא שאלנו, ומצב ההתקנה אינו כבר Root או Shizuku
++                        if (!alreadyPrompted && currentInstaller != Installer.ROOT && currentInstaller != Installer.SHIZUKU) {
++                            if (AppInstaller.hasRootAccess()) {
++                                isShizukuAvailable = AppInstaller.hasShizukuOrSui(this@ComposeActivity) && AppInstaller.hasShizukuPerm()
++                                showRootPrompt = true
++                            }
++                        }
++                    }
+                 }
+ 
+                 availableUpdate?.let { release ->
+@@ -127,6 +152,29 @@ class ComposeActivity : FragmentActivity() {
+                     )
+                 }
+ 
++                // מציג את דיאלוג ה-Root רק אם אין כרגע דיאלוג עדכון שקופץ
++                if (availableUpdate == null && showRootPrompt) {
++                    RootRecommendationDialog(
++                        isShizukuAvailable = isShizukuAvailable,
++                        onEnableRoot = {
++                            showRootPrompt = false
++                            Preferences.putBoolean(this@ComposeActivity, Preferences.PREFERENCE_ROOT_INSTALLER_PROMPTED, true)
++                            Preferences.putInteger(this@ComposeActivity, Preferences.PREFERENCE_INSTALLER_ID, Installer.ROOT.ordinal)
++                            android.widget.Toast.makeText(this@ComposeActivity, "מצב התקנת Root הופעל בהצלחה", android.widget.Toast.LENGTH_SHORT).show()
++                        },
++                        onEnableShizuku = {
++                            showRootPrompt = false
++                            Preferences.putBoolean(this@ComposeActivity, Preferences.PREFERENCE_ROOT_INSTALLER_PROMPTED, true)
++                            Preferences.putInteger(this@ComposeActivity, Preferences.PREFERENCE_INSTALLER_ID, Installer.SHIZUKU.ordinal)
++                            android.widget.Toast.makeText(this@ComposeActivity, "מצב התקנת Shizuku הופעל בהצלחה", android.widget.Toast.LENGTH_SHORT).show()
++                        },
++                        onDismiss = {
++                            showRootPrompt = false
++                            Preferences.putBoolean(this@ComposeActivity, Preferences.PREFERENCE_ROOT_INSTALLER_PROMPTED, true)
++                        }
++                    )
++                }
++
+                 // Keep FLAG_SECURE on until unlocked; auto-prompt while authenticating
+                 LaunchedEffect(lockState) {
+                     when (lockState) {
+@@ -218,6 +266,7 @@ class ComposeActivity : FragmentActivity() {
+ 
+         return defaultStart()
+     }
++
+     private fun defaultStart(): Screen = when {
+         !Preferences.getBoolean(this, Preferences.PREFERENCE_INTRO) -> Screen.Onboarding
+         else -> Screen.Splash()
+```
+
+---
+
 ## 📅 עדכון: 2026-10-21 22:44:05 UTC
 **הודעת קומיט:** Add RootRecommendationDialog composable
 **קוד שינוי:** `87a8ee74ff0c0c7af389c4974b027ee171d91f45`
