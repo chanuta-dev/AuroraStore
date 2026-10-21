@@ -26,6 +26,7 @@ import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.LifecycleEventObserver
 import androidx.lifecycle.compose.LocalLifecycleOwner
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import androidx.lifecycle.lifecycleScope
 import com.aurora.extensions.getPackageName
 import com.aurora.gplayapi.ReleaseInfo
 import com.aurora.gplayapi.SelfUpdateManager
@@ -36,9 +37,13 @@ import com.aurora.store.compose.composition.UI
 import com.aurora.store.compose.navigation.NavDisplay
 import com.aurora.store.compose.navigation.Screen
 import com.aurora.store.compose.theme.AuroraTheme
+import com.aurora.store.compose.ui.dialog.RootRecommendationDialog
 import com.aurora.store.compose.ui.dialog.UpdateAvailableDialog
 import com.aurora.store.compose.ui.lock.AppLockScreen
 import com.aurora.store.data.AppLockManager
+import com.aurora.store.data.helper.DownloadHelper
+import com.aurora.store.data.installer.AppInstaller
+import com.aurora.store.data.model.Installer
 import com.aurora.store.data.model.NetworkStatus
 import com.aurora.store.data.providers.NetworkProvider
 import com.aurora.store.data.receiver.MigrationReceiver
@@ -47,9 +52,9 @@ import com.aurora.store.util.PackageUtil
 import com.aurora.store.util.Preferences
 import dagger.hilt.android.AndroidEntryPoint
 import javax.inject.Inject
-import androidx.lifecycle.lifecycleScope
-import com.aurora.store.data.helper.DownloadHelper
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 
 @AndroidEntryPoint
 class ComposeActivity : FragmentActivity() {
@@ -102,6 +107,8 @@ class ComposeActivity : FragmentActivity() {
                 }
 
                 var availableUpdate by remember { mutableStateOf<ReleaseInfo?>(null) }
+                var showRootPrompt by remember { mutableStateOf(false) }
+                var isShizukuAvailable by remember { mutableStateOf(false) }
 
                 LaunchedEffect(Unit) {
                     val currentVersion = BuildConfig.VERSION_NAME
@@ -109,6 +116,24 @@ class ComposeActivity : FragmentActivity() {
                     val release = SelfUpdateManager.checkForUpdates(currentVersion, includeBeta)
                     if (release != null) {
                         availableUpdate = release
+                    }
+
+                    // בדיקת זיהוי Root ברקע (על Dispatchers.IO כדי לא להקפיא את ה-UI)
+                    withContext(Dispatchers.IO) {
+                        val alreadyPrompted = Preferences.getBoolean(
+                            this@ComposeActivity,
+                            Preferences.PREFERENCE_ROOT_INSTALLER_PROMPTED,
+                            false
+                        )
+                        val currentInstaller = AppInstaller.getCurrentInstaller(this@ComposeActivity)
+
+                        // נשאל רק אם עדיין לא שאלנו, ומצב ההתקנה אינו כבר Root או Shizuku
+                        if (!alreadyPrompted && currentInstaller != Installer.ROOT && currentInstaller != Installer.SHIZUKU) {
+                            if (AppInstaller.hasRootAccess()) {
+                                isShizukuAvailable = AppInstaller.hasShizukuOrSui(this@ComposeActivity) && AppInstaller.hasShizukuPerm()
+                                showRootPrompt = true
+                            }
+                        }
                     }
                 }
 
@@ -123,6 +148,29 @@ class ComposeActivity : FragmentActivity() {
                         },
                         onDismiss = {
                             availableUpdate = null
+                        }
+                    )
+                }
+
+                // מציג את דיאלוג ה-Root רק אם אין כרגע דיאלוג עדכון שקופץ
+                if (availableUpdate == null && showRootPrompt) {
+                    RootRecommendationDialog(
+                        isShizukuAvailable = isShizukuAvailable,
+                        onEnableRoot = {
+                            showRootPrompt = false
+                            Preferences.putBoolean(this@ComposeActivity, Preferences.PREFERENCE_ROOT_INSTALLER_PROMPTED, true)
+                            Preferences.putInteger(this@ComposeActivity, Preferences.PREFERENCE_INSTALLER_ID, Installer.ROOT.ordinal)
+                            android.widget.Toast.makeText(this@ComposeActivity, "מצב התקנת Root הופעל בהצלחה", android.widget.Toast.LENGTH_SHORT).show()
+                        },
+                        onEnableShizuku = {
+                            showRootPrompt = false
+                            Preferences.putBoolean(this@ComposeActivity, Preferences.PREFERENCE_ROOT_INSTALLER_PROMPTED, true)
+                            Preferences.putInteger(this@ComposeActivity, Preferences.PREFERENCE_INSTALLER_ID, Installer.SHIZUKU.ordinal)
+                            android.widget.Toast.makeText(this@ComposeActivity, "מצב התקנת Shizuku הופעל בהצלחה", android.widget.Toast.LENGTH_SHORT).show()
+                        },
+                        onDismiss = {
+                            showRootPrompt = false
+                            Preferences.putBoolean(this@ComposeActivity, Preferences.PREFERENCE_ROOT_INSTALLER_PROMPTED, true)
                         }
                     )
                 }
@@ -218,6 +266,7 @@ class ComposeActivity : FragmentActivity() {
 
         return defaultStart()
     }
+
     private fun defaultStart(): Screen = when {
         !Preferences.getBoolean(this, Preferences.PREFERENCE_INTRO) -> Screen.Onboarding
         else -> Screen.Splash()
