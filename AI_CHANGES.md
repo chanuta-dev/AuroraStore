@@ -1,3 +1,29 @@
+## 📅 עדכון: 2026-10-21 22:43:19 UTC
+**הודעת קומיט:** Update Preferences.kt
+**קוד שינוי:** `c67557180a17886be325e9b3b58609f7eb8f3280`
+
+### 📂 קבצים שהושפעו:
+M	app/src/main/java/com/aurora/store/util/Preferences.kt
+
+### 📝 פירוט השינויים (Diff):
+```diff
+diff --git a/app/src/main/java/com/aurora/store/util/Preferences.kt b/app/src/main/java/com/aurora/store/util/Preferences.kt
+index 0d9e99f..4300d97 100644
+--- a/app/src/main/java/com/aurora/store/util/Preferences.kt
++++ b/app/src/main/java/com/aurora/store/util/Preferences.kt
+@@ -45,7 +45,7 @@ object Preferences {
+     const val PREFERENCE_FOR_YOU = "PREFERENCE_FOR_YOU"
+     const val PREFERENCE_DEFAULT_SELECTED_TAB = "PREFERENCE_DEFAULT_SELECTED_TAB"
+     const val PREFERENCE_INTRO = "PREFERENCE_INTRO"
+-    
++    const val PREFERENCE_ROOT_INSTALLER_PROMPTED = "PREFERENCE_ROOT_INSTALLER_PROMPTED"
+     // התוספת של ה-AI בשביל עדכוני הבטא
+     const val PREFERENCE_INCLUDE_BETA_UPDATES = "PREFERENCE_INCLUDE_BETA_UPDATES"
+ 
+```
+
+---
+
 ## 📅 עדכון: 2026-10-21 17:46:15 UTC
 **הודעת קומיט:** Update ForYouPage.kt
 **קוד שינוי:** `687d7c3e9d471d84be9cbf96d935ba50adb8e270`
