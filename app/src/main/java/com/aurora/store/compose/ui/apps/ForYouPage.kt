@@ -60,6 +60,7 @@ internal fun ForYouContent(
     StreamCarousel(
         modifier = Modifier.fillMaxSize(),
         streamBundle = streamBundle?.get(category),
+        filterSingleAppClusters = false,
         onHeaderClick = onHeaderClick,
         onAppClick = onAppClick,
         onClusterScrolled = onClusterScrolled,
