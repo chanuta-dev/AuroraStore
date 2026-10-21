@@ -1,3 +1,33 @@
+## 📅 עדכון: 2026-10-21 17:46:15 UTC
+**הודעת קומיט:** Update ForYouPage.kt
+**קוד שינוי:** `687d7c3e9d471d84be9cbf96d935ba50adb8e270`
+
+### 📂 קבצים שהושפעו:
+M	app/src/main/java/com/aurora/store/compose/ui/apps/ForYouPage.kt
+
+### 📝 פירוט השינויים (Diff):
+```diff
+diff --git a/app/src/main/java/com/aurora/store/compose/ui/apps/ForYouPage.kt b/app/src/main/java/com/aurora/store/compose/ui/apps/ForYouPage.kt
+index 2bad401..835a7b9 100644
+--- a/app/src/main/java/com/aurora/store/compose/ui/apps/ForYouPage.kt
++++ b/app/src/main/java/com/aurora/store/compose/ui/apps/ForYouPage.kt
+@@ -60,9 +60,10 @@ internal fun ForYouContent(
+     StreamCarousel(
+         modifier = Modifier.fillMaxSize(),
+         streamBundle = streamBundle?.get(category),
++        filterSingleAppClusters = false,
+         onHeaderClick = onHeaderClick,
+         onAppClick = onAppClick,
+         onClusterScrolled = onClusterScrolled,
+         onScrolledToEnd = onScrolledToEnd
+     )
+-}
+\ No newline at end of file
++}
+```
+
+---
+
 ## 📅 עדכון: 2026-09-20 08:48:50 UTC
 **הודעת קומיט:** Refactor PatchedAppManager for dynamic app sources
 
